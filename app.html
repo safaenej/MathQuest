@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MathQuest — Première Spécialité Mathématiques</title>
+<style>
+:root{
+  --bg:#0f1226; --bg2:#171b3a; --card:#1e2347; --card2:#262c58;
+  --txt:#eef0ff; --muted:#9aa0c8; --accent:#7c5cff; --accent2:#00d4a6;
+  --gold:#ffc93c; --red:#ff5c7a; --green:#2ee6a8; --blue:#4da3ff;
+  --radius:18px;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+body{background:linear-gradient(160deg,var(--bg) 0%,var(--bg2) 100%);color:var(--txt);min-height:100vh}
+button{cursor:pointer;border:none;font-family:inherit}
+
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;
+  background:rgba(15,18,38,.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;
+  border-bottom:1px solid rgba(255,255,255,.07)}
+.logo{font-size:22px;font-weight:800;letter-spacing:.5px;display:flex;align-items:center;gap:8px;cursor:pointer}
+.logo span{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.logo small{font-size:11px;color:var(--muted);font-weight:600;margin-left:4px}
+.hud{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.chip{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:99px;padding:6px 14px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px}
+.xpbar{width:130px;height:8px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden}
+.xpfill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;transition:width .5s}
+.langbtn{background:var(--card);color:var(--txt);border:1px solid rgba(255,255,255,.12);border-radius:99px;padding:6px 14px;font-weight:700;font-size:13px}
+.langbtn:hover{border-color:var(--accent)}
+
+main{max-width:900px;margin:0 auto;padding:28px 20px 80px}
+.hero{text-align:center;margin-bottom:34px}
+.hero h1{font-size:32px;font-weight:800;margin-bottom:8px}
+.hero p{color:var(--muted);font-size:16px;max-width:600px;margin:0 auto}
+
+.world{margin-bottom:36px}
+.world-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.world-head .icon{font-size:28px}
+.world-head h2{font-size:20px;font-weight:800}
+.world-head .sub{color:var(--muted);font-size:13px}
+.missions{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.mission{background:var(--card);border:1px solid rgba(255,255,255,.07);border-radius:var(--radius);
+  padding:18px;position:relative;transition:transform .15s,border-color .15s;cursor:pointer}
+.mission:hover{transform:translateY(-3px);border-color:var(--accent)}
+.mission .m-icon{font-size:30px;margin-bottom:8px}
+.mission h3{font-size:16px;font-weight:700;margin-bottom:4px}
+.mission p{font-size:13px;color:var(--muted);margin-bottom:10px}
+.chprog{display:flex;align-items:center;gap:8px}
+.chprog .bar{flex:1;height:7px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden}
+.chprog .fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px}
+.chprog .lbl{font-size:12px;font-weight:700;color:var(--muted)}
+.donebadge{position:absolute;top:12px;right:12px;background:var(--green);color:#04291c;font-size:11px;font-weight:800;padding:3px 9px;border-radius:99px}
+
+/* sections list */
+.seclist{display:grid;gap:12px}
+.secrow{background:var(--card);border:1px solid rgba(255,255,255,.07);border-radius:var(--radius);
+  padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:border-color .15s,transform .15s}
+.secrow:hover{border-color:var(--accent);transform:translateX(4px)}
+.secrow.locked{opacity:.45;cursor:not-allowed}
+.secrow.locked:hover{border-color:rgba(255,255,255,.07);transform:none}
+.secnum{min-width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:#fff}
+.secrow .body{flex:1}
+.secrow h3{font-size:15.5px;font-weight:700}
+.secrow p{font-size:13px;color:var(--muted)}
+.stars{color:var(--gold);font-size:15px;letter-spacing:2px;white-space:nowrap}
+
+.topbar{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.backbtn{background:var(--card);color:var(--txt);border-radius:12px;padding:8px 16px;font-weight:700;font-size:14px;border:1px solid rgba(255,255,255,.1)}
+.backbtn:hover{border-color:var(--accent)}
+.phase-tabs{display:flex;gap:8px;margin-bottom:22px}
+.ptab{flex:1;text-align:center;padding:10px;border-radius:12px;background:var(--card);font-size:14px;font-weight:700;color:var(--muted);border:1px solid transparent}
+.ptab.active{color:var(--txt);border-color:var(--accent);background:var(--card2)}
+.ptab.done{color:var(--green)}
+
+.course-card{background:var(--card);border:1px solid rgba(255,255,255,.07);border-radius:var(--radius);padding:24px;margin-bottom:16px;transition:border-color .3s}
+.course-card h3{font-size:18px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.course-card p{color:#c8ccec;line-height:1.7;font-size:15px}
+.course-card.speaking{border-color:var(--accent)}
+.method{background:var(--card2);border-radius:14px;padding:16px 18px;margin-top:14px}
+.method .step{display:flex;gap:12px;align-items:flex-start;padding:9px 8px;border-radius:10px;transition:background .3s}
+.method .step.speaking{background:rgba(124,92,255,.25)}
+.method .stepnum{min-width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff}
+.method .step p{font-size:14.5px;line-height:1.55}
+.schema{display:flex;justify-content:center;margin:16px 0;background:rgba(255,255,255,.03);border-radius:14px;padding:14px}
+.schema svg{max-width:100%;height:auto}
+.tipbox{background:rgba(255,201,60,.1);border-left:4px solid var(--gold);border-radius:0 12px 12px 0;padding:12px 16px;margin-top:14px;font-size:14px;line-height:1.6;color:#ffe9b3;transition:background .3s}
+.tipbox.speaking{background:rgba(255,201,60,.25)}
+.bigbtn{display:block;width:100%;padding:15px;border-radius:14px;font-size:16px;font-weight:800;color:#fff;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));margin-top:8px;transition:opacity .15s}
+.bigbtn:hover{opacity:.9}
+.narrbar{margin-bottom:14px}
+.narrbtn{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;border-radius:99px;padding:11px 22px;font-weight:800;font-size:14px}
+.narrbtn.on{background:var(--red)}
+
+@keyframes pop{0%{opacity:0;transform:scale(.3)}70%{opacity:1;transform:scale(1.25)}100%{opacity:1;transform:scale(1)}}
+.anim-el{opacity:0;transform-box:fill-box;transform-origin:center}
+.anim-el.show{opacity:1;animation:pop .5s ease}
+#animbox .glow{fill:var(--gold)!important;animation:pop .6s ease}
+
+.ex-progress{display:flex;gap:6px;margin-bottom:18px}
+.ex-dot{flex:1;height:6px;border-radius:99px;background:rgba(255,255,255,.12)}
+.ex-dot.ok{background:var(--green)}.ex-dot.ko{background:var(--red)}.ex-dot.cur{background:var(--accent)}
+.question{background:var(--card);border-radius:var(--radius);padding:26px;border:1px solid rgba(255,255,255,.07)}
+.question .qtxt{font-size:18px;font-weight:700;line-height:1.5;margin-bottom:20px}
+.choices{display:grid;gap:10px}
+.choice{background:var(--card2);border:2px solid transparent;border-radius:13px;padding:14px 18px;font-size:16px;
+  color:var(--txt);text-align:left;font-weight:600;transition:border-color .1s}
+.choice:hover{border-color:var(--accent)}
+.choice.sel{border-color:var(--accent);background:rgba(124,92,255,.15)}
+.choice.correct{border-color:var(--green);background:rgba(46,230,168,.12)}
+.choice.wrong{border-color:var(--red);background:rgba(255,92,122,.12)}
+.numinput{width:100%;padding:14px 18px;border-radius:13px;border:2px solid rgba(255,255,255,.15);
+  background:var(--card2);color:var(--txt);font-size:18px;font-weight:700;outline:none}
+.numinput:focus{border-color:var(--accent)}
+.feedback{margin-top:16px;border-radius:13px;padding:14px 18px;font-size:15px;line-height:1.6;display:none}
+.feedback.good{display:block;background:rgba(46,230,168,.1);border:1px solid var(--green);color:#bff5df}
+.feedback.bad{display:block;background:rgba(255,92,122,.1);border:1px solid var(--red);color:#ffd0da}
+
+.result{text-align:center;background:var(--card);border-radius:var(--radius);padding:40px 26px;border:1px solid rgba(255,255,255,.07)}
+.result .bigstars{font-size:44px;letter-spacing:8px;color:var(--gold);margin:10px 0}
+.result h2{font-size:26px;margin-bottom:6px}
+.result p{color:var(--muted);margin-bottom:20px;font-size:15px}
+.xpgain{display:inline-block;background:rgba(124,92,255,.18);border:1px solid var(--accent);border-radius:99px;
+  padding:8px 22px;font-weight:800;font-size:17px;margin-bottom:22px}
+
+.badges{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:26px}
+.badge{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:10px 16px;
+  font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px}
+.badge.off{opacity:.35;filter:grayscale(1)}
+.hidden{display:none!important}
+@media(max-width:600px){.hero h1{font-size:24px}.hud{gap:8px}.xpbar{width:80px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo" onclick="goHome()">🚀 Math<span>Quest</span><small>1ʳᵉ Spé Maths</small></div>
+  <div class="hud">
+    <div class="chip">⭐ <span id="hud-level">1</span></div>
+    <div class="chip">⚡ <span id="hud-xp">0</span> XP <div class="xpbar"><div class="xpfill" id="hud-xpfill" style="width:0%"></div></div></div>
+    <button class="langbtn" id="soundbtn" onclick="toggleSound()" title="Son">🔊</button>
+  </div>
+</header>
+
+<main>
+  <section id="view-home">
+    <div class="hero">
+      <h1>Programme complet de Première Spé Maths</h1>
+      <p>Chaque leçon du programme officiel, découpée en sections. Chaque section : un cours clair, une animation expliquée à la voix, puis des exercices pour gagner de l'XP.</p>
+    </div>
+    <div id="domains"></div>
+    <div class="badges" id="badges"></div>
+  </section>
+
+  <section id="view-chapter" class="hidden">
+    <div class="topbar">
+      <button class="backbtn" onclick="goHome()">← Programme</button>
+      <h2 id="chapter-title" style="font-size:20px"></h2>
+    </div>
+    <div class="seclist" id="seclist"></div>
+  </section>
+
+  <section id="view-section" class="hidden">
+    <div class="topbar">
+      <button class="backbtn" id="sec-back">← Leçon</button>
+      <h2 id="section-title" style="font-size:19px"></h2>
+    </div>
+    <div class="phase-tabs">
+      <div class="ptab" id="tab-course">📖 Cours</div>
+      <div class="ptab" id="tab-ex">✏️ Exercices</div>
+      <div class="ptab" id="tab-res">🏆 Résultat</div>
+    </div>
+    <div id="phase-course"></div>
+    <div id="phase-ex" class="hidden"></div>
+    <div id="phase-res" class="hidden"></div>
+  </section>
+</main>
+
+<script>
+/* ================================================================
+   OUTIL : construit un schéma SVG à partir de lignes de calcul
+================================================================ */
+function linesSvg(lines){
+  const h = 24 + lines.length*36;
+  return `<svg viewBox="0 0 470 ${h}" width="100%" style="max-width:470px">
+  <style>.dl{font:600 17px 'SF Mono',Menlo,monospace;fill:#eef0ff}</style>` +
+  lines.map((l,i)=>`<text id="dl${i}" class="dl anim-el" x="12" y="${34+i*36}">${l}</text>`).join("") + `</svg>`;
+}
+
+/* ================================================================
+   PROGRAMME OFFICIEL — PREMIÈRE SPÉCIALITÉ MATHÉMATIQUES
+   4 domaines, 9 leçons, chaque leçon en sections animées
+================================================================ */
+const DOMAINS = [
+ {icon:"🧮",name:"Algèbre",chapters:["ch1","ch2"]},
+ {icon:"📈",name:"Analyse",chapters:["ch3","ch10","ch4","ch5"]},
+ {icon:"📐",name:"Géométrie",chapters:["ch6","ch7"]},
+ {icon:"🎲",name:"Probabilités et statistiques",chapters:["ch8","ch9"]},
+ {icon:"📝",name:"Évaluations type examen",chapters:["ex1","ex2","ex3","ex4","ex5"]}
+];
+
+const CHAPTERS = {
+/* ============================================================
+   LEÇON 1 — LE SECOND DEGRÉ
+============================================================ */
+ch1:{icon:"⛰️",title:"Le second degré",desc:"Parabole, discriminant, factorisation et signe du trinôme.",
+ sections:[
+ {id:"c1s1",title:"La parabole et la forme canonique",desc:"Sommet, axe de symétrie, α et β",
+  course:[
+   {h:"💡 L'idée",p:"Une fonction polynôme du second degré s'écrit f(x) = ax² + bx + c, avec a ≠ 0. Sa courbe est toujours une parabole : une vallée si a > 0, une colline si a < 0. Le point le plus bas (ou le plus haut) s'appelle le sommet S."},
+   {h:"🗺️ La méthode : trouver le sommet",method:[
+    "J'identifie a, b et c dans f(x) = ax² + bx + c.",
+    "Je calcule l'abscisse du sommet : α = −b / 2a.",
+    "Je calcule l'ordonnée du sommet : β = f(α), en remplaçant x par α.",
+    "J'écris la forme canonique : f(x) = a(x − α)² + β. La droite verticale x = α est l'axe de symétrie de la parabole."],
+   tip:"Exemple : f(x) = x² − 4x + 1. α = 4/2 = 2, β = f(2) = 4 − 8 + 1 = −3. Forme canonique : (x − 2)² − 3. Sommet S(2 ; −3)."}],
+  demo:{svg:`<svg viewBox="0 0 340 205" width="340">
+   <style>.p1t{font:700 15px sans-serif;fill:#eef0ff;text-anchor:middle}.p1g{font:700 15px sans-serif;fill:#ffc93c;text-anchor:middle}</style>
+   <g id="p1-ax" class="anim-el"><line x1="20" y1="170" x2="320" y2="170" stroke="#9aa0c8" stroke-width="1.5"/><line x1="50" y1="30" x2="50" y2="180" stroke="#9aa0c8" stroke-width="1.5"/></g>
+   <text id="p1-f1" class="p1t anim-el" x="170" y="20">f(x) = ax² + bx + c  (a &gt; 0)</text>
+   <path id="p1-curve" class="anim-el" d="M80 45 Q170 250 260 45" stroke="#00d4a6" stroke-width="3" fill="none"/>
+   <circle id="p1-som" class="anim-el" cx="170" cy="146" r="6" fill="#ffc93c"/>
+   <text id="p1-soml" class="p1g anim-el" x="170" y="196">S(α ; β)</text>
+   <line id="p1-sym" class="anim-el" x1="170" y1="35" x2="170" y2="170" stroke="#7c5cff" stroke-width="2" stroke-dasharray="6 5"/>
+   <text id="p1-f2" class="p1g anim-el" x="250" y="120">α = −b / 2a</text>
+  </svg>`,
+  steps:[
+   {show:["p1-ax","p1-f1","p1-curve"],n:"Une fonction du second degré, f de x égale a x carré plus b x plus c, dessine toujours une parabole. Ici a est positif : la parabole est tournée vers le haut, comme une vallée."},
+   {show:["p1-som","p1-soml"],n:"Le point le plus bas de la vallée s'appelle le sommet S. Ses coordonnées sont alpha et beta."},
+   {show:["p1-sym"],n:"La parabole est parfaitement symétrique par rapport à la droite verticale qui passe par le sommet : c'est l'axe de symétrie, d'équation x égale alpha."},
+   {show:["p1-f2"],glow:["p1-f2"],n:"Pour trouver alpha, une seule formule à retenir : alpha égale moins b divisé par 2 a. Ensuite beta égale f de alpha. Et la forme canonique s'écrit : a fois, x moins alpha au carré, plus beta."}]},
+  ex:[
+   {type:"num",q:"f(x) = x² − 4x + 1. Calcule l'abscisse du sommet : α = ?",a:"2",explain:"α = −b/2a = 4/2 = 2."},
+   {type:"mcq",q:"Si a = −2, la parabole est…",c:["tournée vers le haut (vallée)","tournée vers le bas (colline)","une droite","symétrique par rapport à l'axe des x"],a:1,explain:"a < 0 → la parabole est tournée vers le bas : le sommet est un maximum."},
+   {type:"mcq",q:"La forme canonique de f(x) = x² − 6x + 5 est…",c:["(x − 3)² − 4","(x − 6)² + 5","(x + 3)² − 4","(x − 3)² + 5"],a:0,explain:"α = 6/2 = 3, β = f(3) = 9 − 18 + 5 = −4. Donc f(x) = (x − 3)² − 4."},
+   {type:"num",q:"f(x) = 2x² − 8x + 1. Calcule l'abscisse du sommet : α = ?",a:"2",explain:"α = −b/2a = 8/4 = 2."},
+   {type:"num",q:"f(x) = x² − 6x + 5. Calcule β = f(3) = ?",a:"-4",explain:"β = 9 − 18 + 5 = −4 : le sommet est S(3 ; −4)."},
+   {type:"mcq",q:"L'axe de symétrie de la parabole de f(x) = x² − 4x + 1 est la droite…",c:["x = 2","x = −2","y = 2","x = 4"],a:0,explain:"L'axe de symétrie est la verticale passant par le sommet : x = α = 4/2 = 2."}]},
+ {id:"c1s2",title:"Résoudre : le discriminant",desc:"Δ = b² − 4ac et les racines",
+  course:[
+   {h:"💡 L'idée",p:"Résoudre ax² + bx + c = 0, c'est trouver où la parabole coupe l'axe des abscisses. Le discriminant Δ = b² − 4ac nous dit d'avance combien de solutions existent : deux si Δ > 0, une seule si Δ = 0, aucune si Δ < 0."},
+   {h:"🗺️ La méthode",method:[
+    "J'identifie a, b, c et je calcule Δ = b² − 4ac.",
+    "Si Δ > 0 : deux racines, x₁ = (−b − √Δ)/2a et x₂ = (−b + √Δ)/2a.",
+    "Si Δ = 0 : une racine double, x₀ = −b/2a (le sommet touche l'axe).",
+    "Si Δ < 0 : aucune solution réelle (la parabole ne coupe pas l'axe).",
+    "Je vérifie en remplaçant les solutions dans l'équation."],
+   tip:"Piège classique : si b = −5, alors b² = (−5)² = 25, toujours positif. Mets b entre parenthèses avant de le mettre au carré !"}],
+  demo:{lines:["x² − 5x + 6 = 0","a = 1   b = −5   c = 6","Δ = b² − 4ac = 25 − 24 = 1","Δ &gt; 0 : deux racines","x₁ = (5 − 1)/2 = 2","x₂ = (5 + 1)/2 = 3"],
+  steps:[
+   {show:[0,1],n:"Résolvons x carré moins 5 x plus 6 égale zéro. J'identifie les coefficients : a égale 1, b égale moins 5, c égale 6."},
+   {show:[2],n:"Je calcule le discriminant : delta égale b carré moins 4 a c. Moins 5 au carré donne 25, et 4 fois 1 fois 6 donne 24. Delta égale 1."},
+   {show:[3],n:"Delta est strictement positif : l'équation a exactement deux solutions."},
+   {show:[4,5],glow:[4,5],n:"J'applique les formules : x 1 égale moins b moins racine de delta sur 2 a, soit 5 moins 1 sur 2, égale 2. Et x 2 égale 5 plus 1 sur 2, égale 3. Les solutions sont 2 et 3 !"}]},
+  ex:[
+   {type:"num",q:"Pour 2x² + 3x − 2 = 0, calcule Δ = ?",a:"25",explain:"Δ = 3² − 4×2×(−2) = 9 + 16 = 25."},
+   {type:"mcq",q:"Avec Δ = 25 pour 2x² + 3x − 2 = 0, les solutions sont…",c:["x = 1/2 et x = −2","x = 1 et x = −2","x = 5 et x = −5","Aucune solution"],a:0,explain:"x = (−3 ± 5)/4 : x₁ = −8/4 = −2 et x₂ = 2/4 = 1/2."},
+   {type:"mcq",q:"Si Δ < 0, l'équation ax² + bx + c = 0 admet…",c:["deux solutions","une solution","aucune solution réelle","une infinité"],a:2,explain:"Δ < 0 : la parabole ne coupe jamais l'axe des abscisses."},
+   {type:"num",q:"Pour x² + 2x + 1 = 0, calcule Δ = ?",a:"0",explain:"Δ = 4 − 4 = 0 : une racine double."},
+   {type:"num",q:"x² + 2x + 1 = 0 (Δ = 0). La racine double est x₀ = ?",a:"-1",explain:"x₀ = −b/2a = −2/2 = −1. D'ailleurs x² + 2x + 1 = (x + 1)²."},
+   {type:"mcq",q:"Combien de solutions a x² + x + 1 = 0 ?",c:["Deux","Une","Aucune","Une infinité"],a:2,explain:"Δ = 1 − 4 = −3 &lt; 0 : aucune solution réelle."}]},
+ {id:"c1s3",title:"Factorisation et signe du trinôme",desc:"Forme factorisée, tableau de signe, inéquations",
+  course:[
+   {h:"💡 L'idée",p:"Quand on connaît les racines x₁ et x₂, le trinôme se factorise : ax² + bx + c = a(x − x₁)(x − x₂). Et son signe suit une règle unique : il est du signe de a à l'extérieur des racines, et du signe opposé entre les racines."},
+   {h:"🗺️ La méthode : étudier le signe",method:[
+    "Je calcule Δ et les racines éventuelles.",
+    "Si Δ > 0 : je place x₁ et x₂ dans un tableau de signe. Signe de a à l'extérieur, signe de −a entre les deux.",
+    "Si Δ = 0 : le trinôme est du signe de a partout, et s'annule seulement en x₀.",
+    "Si Δ < 0 : le trinôme est du signe de a sur tout ℝ (il ne s'annule jamais).",
+    "Pour une inéquation, je lis les solutions directement dans le tableau."],
+   tip:"Moyen mnémotechnique : « signe de a à l'extérieur ». C'est logique : loin des racines, le terme ax² domine tout."}],
+  demo:{lines:["x² − 5x + 6 : racines 2 et 3","x² − 5x + 6 = (x − 2)(x − 3)","x &lt; 2 : (−)(−) = +  positif","2 &lt; x &lt; 3 : (+)(−) = −  négatif","x &gt; 3 : (+)(+) = +  positif","x² − 5x + 6 ≤ 0  ⟺  x ∈ [2 ; 3]"],
+  steps:[
+   {show:[0,1],n:"On a trouvé les racines 2 et 3. Le trinôme se factorise donc : x carré moins 5 x plus 6 égale, x moins 2, fois, x moins 3."},
+   {show:[2],n:"Étudions le signe. Avant 2 : x moins 2 est négatif, x moins 3 aussi. Négatif fois négatif : le produit est positif."},
+   {show:[3],n:"Entre 2 et 3 : x moins 2 devient positif, mais x moins 3 reste négatif. Le produit est négatif. C'est la règle : signe opposé à a entre les racines."},
+   {show:[4],n:"Après 3 : les deux facteurs sont positifs, le produit est positif. Signe de a à l'extérieur des racines."},
+   {show:[5],glow:[5],n:"Application directe : le trinôme est négatif ou nul exactement entre ses racines. L'inéquation a pour solution l'intervalle fermé de 2 à 3."}]},
+  ex:[
+   {type:"mcq",q:"La forme factorisée de x² − 5x + 6 est…",c:["(x − 2)(x − 3)","(x + 2)(x + 3)","(x − 1)(x − 6)","(x − 5)(x − 6)"],a:0,explain:"Les racines sont 2 et 3, et a = 1 : f(x) = (x − 2)(x − 3)."},
+   {type:"mcq",q:"Sur ]2 ; 3[, le trinôme x² − 5x + 6 est…",c:["positif","négatif","nul","de signe variable"],a:1,explain:"Entre les racines, le trinôme est du signe opposé à a = 1 : négatif."},
+   {type:"mcq",q:"L'ensemble des solutions de x² − 5x + 6 ≤ 0 est…",c:["[2 ; 3]","]−∞ ; 2]","[3 ; +∞[","ℝ"],a:0,explain:"Le trinôme est négatif ou nul entre ses racines incluses : [2 ; 3]."},
+   {type:"mcq",q:"Le trinôme −x² + 1 (racines −1 et 1) est, entre ses racines…",c:["positif","négatif","nul","de signe variable"],a:0,explain:"Entre les racines, signe opposé à a = −1 : positif."},
+   {type:"mcq",q:"L'ensemble des solutions de x² − 9 &gt; 0 est…",c:["]−∞ ; −3[ ∪ ]3 ; +∞[","]−3 ; 3[","[−3 ; 3]","ℝ"],a:0,explain:"Racines −3 et 3, a = 1 &gt; 0 : strictement positif à l'extérieur des racines."},
+   {type:"num",q:"x² − 4x + 4 = (x − 2)². En quelle valeur unique ce trinôme s'annule-t-il ?",a:"2",explain:"Δ = 0, racine double x = 2 : la parabole touche l'axe en un seul point."}]}
+]},
+
+/* ============================================================
+   LEÇON 2 — LES SUITES NUMÉRIQUES
+============================================================ */
+ch2:{icon:"🪜",title:"Les suites numériques",desc:"Modes de génération, suites arithmétiques et géométriques.",
+ sections:[
+ {id:"c2s1",title:"Découvrir les suites",desc:"Notation uₙ, forme explicite et récurrence",
+  course:[
+   {h:"💡 L'idée",p:"Une suite est une liste infinie de nombres numérotés : u₀, u₁, u₂… Le nombre uₙ est le terme d'indice n. On peut définir une suite de deux façons : par une formule explicite uₙ = f(n) (on calcule directement n'importe quel terme), ou par récurrence (chaque terme se calcule à partir du précédent)."},
+   {h:"🗺️ La méthode : calculer des termes",method:[
+    "Forme explicite uₙ = f(n) : je remplace n par la valeur voulue. Exemple : uₙ = 2n + 1 donne u₅ = 11 directement.",
+    "Récurrence : je pars du premier terme donné, puis j'applique la relation pas à pas. Pour u₅, je dois d'abord calculer u₁, u₂, u₃, u₄.",
+    "Attention à l'indice de départ : u₀ est souvent le premier terme, pas u₁.",
+    "Le sens de variation : la suite est croissante si uₙ₊₁ − uₙ ≥ 0 pour tout n, décroissante si uₙ₊₁ − uₙ ≤ 0."],
+   tip:"uₙ₊₁ signifie « le terme suivant uₙ », alors que uₙ + 1 signifie « uₙ plus 1 ». La position du +1 change tout !"}],
+  demo:{lines:["Explicite : uₙ = 2n + 1","u₀ = 1,  u₁ = 3,  u₂ = 5,  u₃ = 7","Récurrence : v₀ = 3 et vₙ₊₁ = 2vₙ","v₁ = 2×3 = 6","v₂ = 2×6 = 12,  v₃ = 2×12 = 24"],
+  steps:[
+   {show:[0],n:"Première façon de définir une suite : la forme explicite. Ici, u indice n égale 2 n plus 1. Je peux calculer n'importe quel terme directement."},
+   {show:[1],n:"Je remplace n : pour n égale 0, u 0 égale 1. Pour n égale 1, u 1 égale 3. Puis 5, puis 7. La suite des nombres impairs !"},
+   {show:[2],n:"Deuxième façon : la récurrence. On donne le premier terme, v 0 égale 3, et la règle de passage : chaque terme est le double du précédent."},
+   {show:[3],n:"Je calcule pas à pas : v 1 égale 2 fois 3, égale 6."},
+   {show:[4],glow:[4],n:"Puis v 2 égale 12, v 3 égale 24. Avec une récurrence, impossible de sauter des étapes : il faut passer par tous les termes précédents !"}]},
+  ex:[
+   {type:"num",q:"uₙ = n² + 1. Calcule u₃ = ?",a:"10",explain:"u₃ = 3² + 1 = 10."},
+   {type:"num",q:"u₀ = 2 et uₙ₊₁ = uₙ + 5. Calcule u₂ = ?",a:"12",explain:"u₁ = 2 + 5 = 7, puis u₂ = 7 + 5 = 12."},
+   {type:"mcq",q:"Quel est l'avantage d'une forme explicite ?",c:["Elle est toujours plus simple à trouver","On calcule n'importe quel terme directement, sans les précédents","Elle marche seulement pour les petites valeurs de n","Elle évite les multiplications"],a:1,explain:"Avec uₙ = f(n), u₁₀₀ se calcule en une étape. Par récurrence, il faudrait 100 calculs."},
+   {type:"num",q:"uₙ = 3n − 2. Calcule u₅ = ?",a:"13",explain:"u₅ = 3×5 − 2 = 13."},
+   {type:"num",q:"u₀ = 1 et uₙ₊₁ = 2uₙ + 1. Calcule u₂ = ?",a:"7",explain:"u₁ = 2×1 + 1 = 3, puis u₂ = 2×3 + 1 = 7."},
+   {type:"mcq",q:"Si uₙ₊₁ − uₙ ≥ 0 pour tout n, la suite est…",c:["croissante","décroissante","constante","géométrique"],a:0,explain:"Chaque terme dépasse (ou égale) le précédent : la suite est croissante."}]},
+ {id:"c2s2",title:"Les suites arithmétiques",desc:"Raison r, terme général, somme des termes",
+  course:[
+   {h:"💡 L'idée",p:"Une suite arithmétique avance à pas constant : on ajoute toujours le même nombre r, appelé la raison. uₙ₊₁ = uₙ + r. Exemple : 5, 8, 11, 14… est arithmétique de raison 3. C'est le modèle de toute évolution régulière (salaire qui augmente de 100 € par an, escalier…)."},
+   {h:"🗺️ La méthode",method:[
+    "Reconnaître : je vérifie que la différence uₙ₊₁ − uₙ est constante. Cette constante est la raison r.",
+    "Terme général : uₙ = u₀ + n × r (ou uₙ = uₚ + (n − p) × r si on part de uₚ). Fini la récurrence pas à pas !",
+    "Sens de variation : croissante si r > 0, décroissante si r < 0.",
+    "Somme des termes : 1 + 2 + ⋯ + n = n(n + 1)/2, et plus généralement S = (nombre de termes) × (premier + dernier)/2."],
+   tip:"L'histoire du petit Gauss : pour calculer 1 + 2 + ⋯ + 100, il regroupa (1+100) + (2+99) + ⋯ = 50 paires de 101 = 5050. C'est exactement la formule !"}],
+  demo:{lines:["u₀ = 5, raison r = 3","5 → 8 → 11 → 14 → …  (+3 à chaque pas)","uₙ = u₀ + n·r = 5 + 3n","u₁₀ = 5 + 30 = 35","S = 1+2+⋯+100 = 100×101/2 = 5050"],
+  steps:[
+   {show:[0,1],n:"Voici une suite arithmétique : premier terme 5, raison 3. À chaque pas, j'ajoute 3 : 5, puis 8, puis 11, puis 14."},
+   {show:[2],n:"Pour aller directement au terme numéro n, j'ajoute n fois la raison : u indice n égale u 0 plus n fois r, soit 5 plus 3 n."},
+   {show:[3],n:"Par exemple, u 10 égale 5 plus 3 fois 10, égale 35. Pas besoin de calculer les 9 termes intermédiaires !"},
+   {show:[4],glow:[4],n:"Et pour additionner 1 plus 2 plus etc. jusqu'à 100 : nombre de termes fois, premier plus dernier, divisé par 2. Soit 100 fois 101 sur 2 : 5050."}]},
+  ex:[
+   {type:"num",q:"La suite 5, 8, 11, 14… est arithmétique. Sa raison r = ?",a:"3",explain:"8 − 5 = 3, 11 − 8 = 3 : on ajoute toujours 3."},
+   {type:"num",q:"u₀ = 2 et r = 3. Calcule u₁₀ = ?",a:"32",explain:"u₁₀ = u₀ + 10r = 2 + 30 = 32."},
+   {type:"num",q:"Calcule S = 1 + 2 + 3 + ⋯ + 100 = ?",a:"5050",explain:"S = 100 × 101 / 2 = 5050."},
+   {type:"num",q:"Suite arithmétique : u₂ = 11 et r = 3. Calcule u₅ = ?",a:"20",explain:"u₅ = u₂ + 3r = 11 + 9 = 20."},
+   {type:"mcq",q:"Laquelle de ces suites est arithmétique ?",c:["4, 7, 10, 13…","1, 2, 4, 8…","1, 4, 9, 16…","5, 5, 6, 6…"],a:0,explain:"4, 7, 10, 13 : on ajoute toujours 3. Les autres n'ont pas d'écart constant."},
+   {type:"num",q:"Calcule 1 + 2 + 3 + ⋯ + 10 = ?",a:"55",explain:"10 × 11 / 2 = 55."}]},
+ {id:"c2s3",title:"Les suites géométriques",desc:"Raison q, terme général, somme des termes",
+  course:[
+   {h:"💡 L'idée",p:"Une suite géométrique avance par multiplication : on multiplie toujours par le même nombre q, la raison. uₙ₊₁ = q × uₙ. Exemple : 2, 6, 18, 54… est géométrique de raison 3. C'est le modèle de la croissance exponentielle : intérêts bancaires, épidémies, population de bactéries."},
+   {h:"🗺️ La méthode",method:[
+    "Reconnaître : je vérifie que le quotient uₙ₊₁ / uₙ est constant. Ce quotient est la raison q.",
+    "Terme général : uₙ = u₀ × qⁿ. Multiplier n fois par q, c'est multiplier par q puissance n.",
+    "Sens de variation (u₀ > 0) : croissante si q > 1, décroissante si 0 < q < 1.",
+    "Somme des termes : 1 + q + q² + ⋯ + qⁿ = (1 − qⁿ⁺¹)/(1 − q), pour q ≠ 1."],
+   tip:"Augmenter de 5 %, c'est multiplier par 1,05. Diminuer de 20 %, c'est multiplier par 0,80. Les pourcentages d'évolution cachent toujours une suite géométrique !"}],
+  demo:{lines:["u₀ = 5, raison q = 2","5 → 10 → 20 → 40 → …  (×2 à chaque pas)","uₙ = u₀ × qⁿ = 5 × 2ⁿ","u₄ = 5 × 2⁴ = 5 × 16 = 80","Capital à 5 % : Cₙ = C₀ × 1,05ⁿ"],
+  steps:[
+   {show:[0,1],n:"Voici une suite géométrique : premier terme 5, raison 2. À chaque pas, je multiplie par 2 : 5, puis 10, puis 20, puis 40. Ça grimpe vite !"},
+   {show:[2],n:"Pour sauter directement au terme numéro n : multiplier n fois par q, c'est multiplier par q puissance n. Donc u indice n égale u 0 fois q puissance n."},
+   {show:[3],n:"Par exemple, u 4 égale 5 fois 2 puissance 4, soit 5 fois 16 : 80."},
+   {show:[4],glow:[4],n:"Application concrète : un capital placé à 5 pour cent par an est multiplié par 1,05 chaque année. Après n années : C 0 fois 1,05 puissance n. Les banques font des maths !"}]},
+  ex:[
+   {type:"num",q:"La suite 2, 6, 18, 54… est géométrique. Sa raison q = ?",a:"3",explain:"6/2 = 3, 18/6 = 3 : on multiplie toujours par 3."},
+   {type:"num",q:"u₀ = 5 et q = 2. Calcule u₄ = ?",a:"80",explain:"u₄ = 5 × 2⁴ = 5 × 16 = 80."},
+   {type:"mcq",q:"Un prix augmente de 10 % par an. La suite des prix est…",c:["arithmétique de raison 10","géométrique de raison 1,10","géométrique de raison 10","arithmétique de raison 1,10"],a:1,explain:"Augmenter de 10 % = multiplier par 1,10 chaque année : suite géométrique de raison 1,10."},
+   {type:"num",q:"Suite géométrique : u₀ = 3 et q = 10. Calcule u₃ = ?",a:"3000",explain:"u₃ = 3 × 10³ = 3000."},
+   {type:"mcq",q:"Diminuer de 25 %, c'est multiplier par…",c:["0,75","0,25","1,25","−0,25"],a:0,explain:"1 − 25/100 = 0,75."},
+   {type:"num",q:"Calcule 1 + 2 + 4 + 8 + 16 = ?",a:"31",explain:"Somme géométrique de raison 2 : (2⁵ − 1)/(2 − 1) = 31."}]}
+]}
+,
+/* ============================================================
+   LEÇON 3 — LA DÉRIVATION
+============================================================ */
+ch3:{icon:"🎿",title:"La dérivation",desc:"Nombre dérivé, tangente, calcul des dérivées, variations.",
+ sections:[
+ {id:"c3s1",title:"Nombre dérivé et tangente",desc:"Taux de variation, pente d'une courbe en un point",
+  course:[
+   {h:"💡 L'idée",p:"La dérivée mesure la vitesse de variation d'une fonction en un point précis — comme l'inclinaison d'une piste de ski à l'endroit exact où tu te trouves. Graphiquement, le nombre dérivé f'(a) est la pente de la tangente à la courbe au point d'abscisse a."},
+   {h:"🗺️ La méthode",method:[
+    "Le taux de variation entre a et a + h : (f(a + h) − f(a)) / h. C'est la pente de la droite qui relie les deux points.",
+    "Quand h tend vers 0, les deux points se rapprochent : la droite devient la tangente. Sa pente est le nombre dérivé f'(a).",
+    "L'équation de la tangente au point d'abscisse a : y = f'(a)(x − a) + f(a).",
+    "Interprétation du signe : f'(a) > 0, la courbe monte en ce point ; f'(a) < 0, elle descend ; f'(a) = 0, tangente horizontale."],
+   tip:"Vision clé : dériver, c'est zoomer sur la courbe jusqu'à ce qu'elle ressemble à une droite. La pente de cette droite, c'est la dérivée."}],
+  demo:{svg:`<svg viewBox="0 0 340 190" width="340">
+   <style>.t3{font:700 16px sans-serif;fill:#eef0ff;text-anchor:middle}</style>
+   <g id="t3-ax" class="anim-el"><line x1="20" y1="150" x2="320" y2="150" stroke="#9aa0c8" stroke-width="1.5"/><line x1="45" y1="25" x2="45" y2="160" stroke="#9aa0c8" stroke-width="1.5"/></g>
+   <path id="t3-curve" class="anim-el" d="M60 30 Q170 240 280 30" stroke="#7c5cff" stroke-width="3" fill="none"/>
+   <circle id="t3-pt" class="anim-el" cx="225" cy="109" r="6" fill="#ffc93c"/>
+   <line id="t3-sec" class="anim-el" x1="120" y1="140" x2="290" y2="60" stroke="#4da3ff" stroke-width="2" stroke-dasharray="7 5"/>
+   <line id="t3-tan" class="anim-el" x1="155" y1="176" x2="295" y2="42" stroke="#ffc93c" stroke-width="2.5"/>
+   <text id="t3-f" class="t3 anim-el" x="170" y="18">pente de la tangente = f'(a)</text>
+  </svg>`,
+  steps:[
+   {show:["t3-ax","t3-curve"],n:"Voici la courbe d'une fonction. Question : à quelle vitesse monte-t-elle exactement en un point donné ?"},
+   {show:["t3-pt","t3-sec"],n:"Je choisis mon point, et un deuxième point un peu plus loin. La droite qui les relie a une pente : c'est le taux de variation, f de a plus h moins f de a, divisé par h."},
+   {show:["t3-tan"],n:"Maintenant je rapproche le deuxième point de plus en plus : h tend vers zéro. La droite pivote et devient la tangente : elle ne touche la courbe qu'en ce point."},
+   {show:["t3-f"],glow:["t3-f"],n:"La pente de cette tangente, c'est le nombre dérivé f prime de a. Positif : ça monte. Négatif : ça descend. Nul : tangente horizontale, sommet ou creux !"}]},
+  ex:[
+   {type:"mcq",q:"Le nombre dérivé f'(a) représente graphiquement…",c:["l'ordonnée du point","la pente de la tangente en a","l'aire sous la courbe","la distance à l'origine"],a:1,explain:"f'(a) est le coefficient directeur (la pente) de la tangente à la courbe au point d'abscisse a."},
+   {type:"mcq",q:"Si f'(a) = 0, alors au point d'abscisse a…",c:["la courbe s'arrête","la tangente est horizontale","la tangente est verticale","f(a) = 0"],a:1,explain:"Pente nulle = tangente horizontale : souvent un maximum ou un minimum."},
+   {type:"mcq",q:"Le taux de variation de f entre a et a + h est…",c:["(f(a+h) − f(a)) / h","f(a+h) − f(a)","f(h) / h","(f(a) + f(h)) / 2"],a:0,explain:"C'est l'accroissement de f divisé par l'accroissement de x : la pente entre les deux points."},
+   {type:"num",q:"f(x) = x². Taux de variation entre 1 et 3 : (f(3) − f(1))/(3 − 1) = ?",a:"4",explain:"(9 − 1)/2 = 4 : la pente moyenne entre les deux points."},
+   {type:"mcq",q:"L'équation de la tangente au point d'abscisse a est…",c:["y = f'(a)(x − a) + f(a)","y = f(a)·x + f'(a)","y = f'(a)·x","y = f(x) − f(a)"],a:0,explain:"Droite de pente f'(a) passant par le point (a ; f(a))."},
+   {type:"mcq",q:"Si f'(a) &lt; 0, alors au point d'abscisse a la courbe…",c:["monte","descend","est horizontale","s'arrête"],a:1,explain:"Pente négative : la fonction décroît en ce point."}]},
+ {id:"c3s2",title:"Calculer les dérivées",desc:"Formules de référence et opérations",
+  course:[
+   {h:"📋 Les dérivées de référence",p:"À connaître par cœur : (k)' = 0 pour une constante. (x)' = 1. (x²)' = 2x. (xⁿ)' = n·xⁿ⁻¹. (1/x)' = −1/x². (√x)' = 1/(2√x)."},
+   {h:"🗺️ La méthode : dériver une expression",method:[
+    "Somme : (u + v)' = u' + v'. Je dérive terme par terme.",
+    "Constante multiplicative : (k·u)' = k·u'. Le coefficient reste en place : (5x³)' = 5 × 3x² = 15x².",
+    "Produit : (u·v)' = u'v + uv'. Attention, ce n'est PAS u'v' !",
+    "Quotient : (u/v)' = (u'v − uv') / v².",
+    "Je simplifie le résultat en regroupant les termes."],
+   tip:"Erreur n°1 au bac : dériver un produit comme si c'était une somme. (uv)' = u'v + uv', jamais u'×v' !"}],
+  demo:{lines:["f(x) = 3x³ − 5x² + 7x − 2","(3x³)' = 3 × 3x² = 9x²","(−5x²)' = −5 × 2x = −10x","(7x)' = 7    (−2)' = 0","f'(x) = 9x² − 10x + 7"],
+  steps:[
+   {show:[0],n:"Dérivons f de x égale 3 x cube moins 5 x carré plus 7 x moins 2. Je dérive terme par terme."},
+   {show:[1],n:"Premier terme : la dérivée de x cube est 3 x carré. Je garde le coefficient 3 : ça donne 9 x carré."},
+   {show:[2],n:"Deuxième terme : la dérivée de x carré est 2 x. Avec le coefficient moins 5 : moins 10 x."},
+   {show:[3],n:"La dérivée de 7 x est 7. Et la dérivée d'une constante comme moins 2 est zéro : les constantes disparaissent !"},
+   {show:[4],glow:[4],n:"Je rassemble : f prime de x égale 9 x carré moins 10 x plus 7. Et voilà !"}]},
+  ex:[
+   {type:"mcq",q:"La dérivée de f(x) = x³ est…",c:["3x²","x²","3x","x³/3"],a:0,explain:"(xⁿ)' = n·xⁿ⁻¹ donc (x³)' = 3x²."},
+   {type:"mcq",q:"Si f(x) = 3x² + 4x − 5, alors f'(x) = ?",c:["6x + 4","3x + 4","6x − 5","6x² + 4"],a:0,explain:"(3x²)' = 6x, (4x)' = 4, (−5)' = 0."},
+   {type:"mcq",q:"La dérivée d'un produit (u·v)' vaut…",c:["u'·v'","u'v + uv'","u' + v'","(u + v)'"],a:1,explain:"Formule du produit : (uv)' = u'v + uv'. Jamais u'v' !"},
+   {type:"mcq",q:"La dérivée de 1/x est…",c:["−1/x²","1/x²","x","−x"],a:0,explain:"(1/x)' = −1/x², à connaître par cœur."},
+   {type:"mcq",q:"La dérivée de 5x³ est…",c:["15x²","5x²","3x²","15x³"],a:0,explain:"(5x³)' = 5 × 3x² = 15x²."},
+   {type:"mcq",q:"La dérivée de √x est…",c:["1/(2√x)","√x/2","2√x","1/√x"],a:0,explain:"(√x)' = 1/(2√x), valable pour x &gt; 0."}]},
+ {id:"c3s3",title:"Dérivée et variations",desc:"Signe de f', tableau de variations, extremums",
+  course:[
+   {h:"💡 L'idée",p:"Le lien le plus puissant du programme : le SIGNE de f' donne le SENS DE VARIATION de f. Là où f' > 0, f monte. Là où f' < 0, f descend. Là où f' s'annule en changeant de signe, f atteint un maximum ou un minimum."},
+   {h:"🗺️ La méthode : dresser le tableau de variations",method:[
+    "Je calcule f'(x).",
+    "J'étudie le signe de f'(x) : je résous f'(x) = 0, puis je détermine le signe sur chaque intervalle (souvent avec les règles du second degré !).",
+    "Je construis le tableau : ligne du signe de f', puis ligne des variations de f (flèche montante si +, descendante si −).",
+    "Aux changements de signe de f', je calcule la valeur de f : ce sont les extremums."],
+   tip:"La boucle est bouclée : pour étudier le signe de f', tu réutilises le tableau de signe du trinôme de la leçon Second degré !"}],
+  demo:{lines:["f(x) = x² − 4x + 1","f'(x) = 2x − 4","f'(x) = 0  ⟺  x = 2","x &lt; 2 : f' &lt; 0, f décroît ↘","x &gt; 2 : f' &gt; 0, f croît ↗","minimum en x = 2 : f(2) = −3"],
+  steps:[
+   {show:[0,1],n:"Étudions f de x égale x carré moins 4 x plus 1. Sa dérivée : f prime de x égale 2 x moins 4."},
+   {show:[2],n:"Je cherche où la dérivée s'annule : 2 x moins 4 égale zéro, donc x égale 2."},
+   {show:[3],n:"Avant 2 : f prime est négative, donc la fonction descend."},
+   {show:[4],n:"Après 2 : f prime est positive, donc la fonction monte."},
+   {show:[5],glow:[5],n:"La fonction descend puis monte : elle atteint son minimum en x égale 2, et ce minimum vaut f de 2, égale moins 3. C'est exactement le sommet de la parabole !"}]},
+  ex:[
+   {type:"mcq",q:"Si f'(x) > 0 sur un intervalle, alors f y est…",c:["croissante","décroissante","constante","nulle"],a:0,explain:"Dérivée positive = fonction croissante. C'est LE théorème central de l'analyse."},
+   {type:"num",q:"f(x) = x² − 4x. En quelle valeur de x la fonction atteint-elle son minimum ?",a:"2",explain:"f'(x) = 2x − 4 s'annule en x = 2 en passant de − à + : minimum en 2."},
+   {type:"num",q:"f(x) = x² − 4x. Quelle est la valeur de ce minimum ? f(2) = ?",a:"-4",explain:"f(2) = 4 − 8 = −4."},
+   {type:"mcq",q:"Si f'(x) = x² + 1 (toujours strictement positif), alors f est…",c:["croissante sur ℝ","décroissante sur ℝ","constante","d'abord croissante puis décroissante"],a:0,explain:"f' reste strictement positive : f est strictement croissante sur ℝ."},
+   {type:"num",q:"f(x) = x³ − 3x, f'(x) = 3x² − 3. f' s'annule en x = 1 et en x = ?",a:"-1",explain:"3x² − 3 = 0 ⟺ x² = 1 ⟺ x = 1 ou x = −1."},
+   {type:"mcq",q:"En un maximum local, la dérivée…",c:["s'annule en passant de + à −","s'annule en passant de − à +","reste positive","n'existe pas"],a:0,explain:"La fonction monte (f' &gt; 0) puis descend (f' &lt; 0) : f' s'annule en changeant de signe de + vers −."}]}
+]},
+
+/* ============================================================
+   LEÇON 4 — LA FONCTION EXPONENTIELLE
+============================================================ */
+ch4:{icon:"🚀",title:"La fonction exponentielle",desc:"Définition, propriétés algébriques, croissance.",
+ sections:[
+ {id:"c4s1",title:"Découvrir l'exponentielle",desc:"Définition, courbe, propriétés fondamentales",
+  course:[
+   {h:"💡 L'idée",p:"La fonction exponentielle est l'unique fonction égale à sa propre dérivée et qui vaut 1 en 0 : exp' = exp et exp(0) = 1. On la note eˣ, où e ≈ 2,718. C'est la fonction de la croissance qui s'auto-alimente : plus elle est grande, plus elle grandit vite."},
+   {h:"📋 Les propriétés fondamentales",method:[
+    "exp(0) = 1 et exp(1) = e ≈ 2,718.",
+    "eˣ > 0 pour TOUT x : l'exponentielle ne s'annule jamais, ne devient jamais négative.",
+    "La fonction exp est strictement croissante sur ℝ.",
+    "(eˣ)' = eˣ : elle est sa propre dérivée. Cas unique !",
+    "Conséquence : eᵃ = eᵇ ⟺ a = b, et eᵃ < eᵇ ⟺ a < b (utile pour les équations)."],
+   tip:"Même e⁻¹⁰⁰⁰ est strictement positif (minuscule, mais positif). « eˣ > 0 toujours » débloque beaucoup de questions de signe au bac."}],
+  demo:{svg:`<svg viewBox="0 0 340 190" width="340">
+   <style>.e4{font:700 15px sans-serif;fill:#eef0ff;text-anchor:middle}.e4g{font:700 15px sans-serif;fill:#ffc93c;text-anchor:middle}</style>
+   <g id="e4-ax" class="anim-el"><line x1="20" y1="155" x2="320" y2="155" stroke="#9aa0c8" stroke-width="1.5"/><line x1="60" y1="15" x2="60" y2="165" stroke="#9aa0c8" stroke-width="1.5"/></g>
+   <path id="e4-curve" class="anim-el" d="M25 150 C120 146 220 120 300 18" stroke="#00d4a6" stroke-width="3" fill="none"/>
+   <circle id="e4-pt" class="anim-el" cx="60" cy="133" r="6" fill="#ffc93c"/>
+   <text id="e4-ptl" class="e4g anim-el" x="95" y="125">(0 ; 1)</text>
+   <text id="e4-lbl" class="e4 anim-el" x="265" y="60">y = eˣ</text>
+   <text id="e4-pos" class="e4g anim-el" x="170" y="185">eˣ &gt; 0 pour tout x</text>
+  </svg>`,
+  steps:[
+   {show:["e4-ax","e4-curve","e4-lbl"],n:"Voici la courbe de la fonction exponentielle. À gauche, elle s'approche de zéro sans jamais le toucher. À droite, elle explose vers l'infini."},
+   {show:["e4-pt","e4-ptl"],n:"Elle passe par le point zéro, un : e puissance zéro égale 1. Et e puissance 1 égale e, environ 2,72."},
+   {show:["e4-pos"],glow:["e4-pos"],n:"Propriété capitale : l'exponentielle est strictement positive pour tout x, et strictement croissante. Elle ne s'annule jamais !"},
+   {show:[],n:"Dernière merveille : sa dérivée est elle-même. En chaque point, la pente de la courbe est égale à la hauteur de la courbe. Plus elle est haute, plus elle grimpe vite : c'est la croissance qui s'auto-alimente."}]},
+  ex:[
+   {type:"num",q:"Que vaut e⁰ ?",a:"1",explain:"Par définition, exp(0) = 1."},
+   {type:"mcq",q:"La dérivée de eˣ est…",c:["x·eˣ⁻¹","eˣ","e","1/eˣ"],a:1,explain:"L'exponentielle est sa propre dérivée : (eˣ)' = eˣ."},
+   {type:"mcq",q:"Pour tout réel x, eˣ est…",c:["strictement positif","parfois négatif","nul en x = 0","positif seulement si x > 0"],a:0,explain:"eˣ > 0 pour tout x, même très négatif : e⁻¹⁰⁰ est minuscule mais positif."},
+   {type:"mcq",q:"La valeur approchée de e est…",c:["2,72","3,14","1,62","2,00"],a:0,explain:"e ≈ 2,718. (3,14 c'est π !)"},
+   {type:"mcq",q:"L'équation eˣ = 0 admet…",c:["aucune solution","x = 0","x = 1","une infinité de solutions"],a:0,explain:"eˣ &gt; 0 pour tout x : l'exponentielle ne s'annule jamais."},
+   {type:"mcq",q:"La fonction exponentielle est…",c:["strictement croissante sur ℝ","décroissante sur ℝ","croissante seulement si x &gt; 0","périodique"],a:0,explain:"exp est strictement croissante sur tout ℝ."}]},
+ {id:"c4s2",title:"Les règles de calcul",desc:"eᵃ⁺ᵇ, eᵃ⁻ᵇ, e⁻ᵃ, (eᵃ)ⁿ",
+  course:[
+   {h:"💡 L'idée",p:"L'exponentielle transforme les additions en multiplications : eᵃ⁺ᵇ = eᵃ × eᵇ. Toutes les autres règles en découlent. Ce sont exactement les règles des puissances que tu connais déjà : eˣ se manipule comme 2ˣ ou 10ˣ."},
+   {h:"📋 Les règles",method:[
+    "eᵃ⁺ᵇ = eᵃ × eᵇ : l'addition devient multiplication.",
+    "eᵃ⁻ᵇ = eᵃ / eᵇ : la soustraction devient division.",
+    "e⁻ᵃ = 1 / eᵃ : l'opposé devient inverse.",
+    "(eᵃ)ⁿ = eⁿᵃ : la puissance multiplie les exposants.",
+    "Pour résoudre une équation : je me ramène à eᴬ = eᴮ, puis A = B (car exp est strictement croissante)."],
+   tip:"Astuce de simplification : regroupe TOUT en une seule exponentielle avant de conclure. eˣ·eˣ·e² = e²ˣ⁺²."}],
+  demo:{lines:["e³ × e⁵ = e³⁺⁵ = e⁸","e⁷ / e⁴ = e⁷⁻⁴ = e³","1 / e² = e⁻²","(e²)³ = e⁶","eˣ⁺¹ = e³  ⟺  x + 1 = 3  ⟺  x = 2"],
+  steps:[
+   {show:[0],n:"Première règle : e 3 fois e 5. J'additionne les exposants : e puissance 8."},
+   {show:[1],n:"Pour une division, je soustrais les exposants : e 7 sur e 4 égale e 3."},
+   {show:[2],n:"L'inverse de e 2, c'est e puissance moins 2. Un exposant négatif signifie : inverse."},
+   {show:[3],n:"Une puissance de puissance ? Je multiplie les exposants : e 2 au cube égale e 6."},
+   {show:[4],glow:[4],n:"Et pour résoudre une équation : comme l'exponentielle est strictement croissante, e A égale e B équivaut à A égale B. Ici x plus 1 égale 3, donc x égale 2."}]},
+  ex:[
+   {type:"mcq",q:"e² × e⁴ = ?",c:["e⁸","e⁶","e²","2e⁶"],a:1,explain:"On additionne les exposants : e²⁺⁴ = e⁶."},
+   {type:"mcq",q:"e⁵ / e³ = ?",c:["e²","e⁸","e¹⁵","e⁵/³"],a:0,explain:"On soustrait les exposants : e⁵⁻³ = e²."},
+   {type:"num",q:"Résous eˣ⁺² = e⁷. x = ?",a:"5",explain:"exp strictement croissante : x + 2 = 7, donc x = 5."},
+   {type:"mcq",q:"e⁻³ = ?",c:["1/e³","−e³","e/3","−3e"],a:0,explain:"Exposant négatif = inverse : e⁻³ = 1/e³."},
+   {type:"mcq",q:"(e⁴)² = ?",c:["e⁸","e⁶","e¹⁶","2e⁴"],a:0,explain:"Puissance de puissance : on multiplie les exposants, e⁸."},
+   {type:"num",q:"Résous eˣ = e⁵ × e². x = ?",a:"7",explain:"e⁵ × e² = e⁷, donc x = 7."}]}
+]},
+
+/* ============================================================
+   LEÇON 5 — FONCTIONS TRIGONOMÉTRIQUES
+============================================================ */
+ch5:{icon:"🎡",title:"Fonctions trigonométriques",desc:"Cercle trigonométrique, radians, cosinus et sinus.",
+ sections:[
+ {id:"c5s1",title:"Le cercle trigonométrique et le radian",desc:"Enroulement de la droite, mesure en radians",
+  course:[
+   {h:"💡 L'idée",p:"Le cercle trigonométrique est le cercle de centre O et de rayon 1, parcouru dans le sens inverse des aiguilles d'une montre (sens direct). Le radian mesure un angle par la longueur de l'arc qu'il découpe : un tour complet = périmètre du cercle = 2π radians = 360°."},
+   {h:"🗺️ La méthode : convertir degrés ↔ radians",method:[
+    "La correspondance de base : 180° = π radians. Tout part de là.",
+    "Degrés → radians : je multiplie par π/180. Exemple : 60° = 60π/180 = π/3.",
+    "Radians → degrés : je multiplie par 180/π. Exemple : π/4 = 180/4 = 45°.",
+    "Les valeurs à connaître : 30° = π/6, 45° = π/4, 60° = π/3, 90° = π/2, 180° = π, 360° = 2π."],
+   tip:"Pour retenir : π/6 < π/4 < π/3, comme 30 < 45 < 60. Plus le dénominateur est petit, plus l'angle est grand !"}],
+  demo:{svg:`<svg viewBox="0 0 340 210" width="340">
+   <style>.c5{font:700 14px sans-serif;fill:#eef0ff;text-anchor:middle}.c5g{font:700 14px sans-serif;fill:#ffc93c;text-anchor:middle}</style>
+   <g id="c5-ax" class="anim-el"><line x1="30" y1="105" x2="310" y2="105" stroke="#9aa0c8" stroke-width="1.5"/><line x1="170" y1="15" x2="170" y2="195" stroke="#9aa0c8" stroke-width="1.5"/></g>
+   <circle id="c5-cir" class="anim-el" cx="170" cy="105" r="72" fill="none" stroke="#7c5cff" stroke-width="2.5"/>
+   <text id="c5-un" class="c5g anim-el" x="256" y="97">1</text>
+   <g id="c5-ang" class="anim-el"><line x1="170" y1="105" x2="206" y2="43" stroke="#00d4a6" stroke-width="2.5"/><circle cx="206" cy="43" r="6" fill="#ffc93c"/><path d="M 195 105 A 25 25 0 0 0 182.5 83.4" fill="none" stroke="#ffc93c" stroke-width="2"/></g>
+   <text id="c5-ml" class="c5 anim-el" x="228" y="32">M</text>
+   <text id="c5-rad" class="c5g anim-el" x="170" y="207">180° = π rad&#160;&#160;&#160;90° = π/2&#160;&#160;&#160;60° = π/3</text>
+  </svg>`,
+  steps:[
+   {show:["c5-ax","c5-cir","c5-un"],n:"Voici le cercle trigonométrique : centre à l'origine, rayon 1. On le parcourt dans le sens inverse des aiguilles d'une montre, appelé sens direct."},
+   {show:["c5-ang","c5-ml"],n:"À chaque nombre réel x, on associe un point M sur le cercle : on enroule la droite des réels autour du cercle, en partant du point tout à droite."},
+   {show:[],n:"Le radian, c'est la mesure naturelle : l'angle vaut la longueur de l'arc parcouru. Un tour complet égale le périmètre : 2 pi radians, soit 360 degrés."},
+   {show:["c5-rad"],glow:["c5-rad"],n:"La conversion clé : 180 degrés égale pi radians. Donc 90 degrés égale pi sur 2, 60 degrés égale pi sur 3, 45 degrés égale pi sur 4, 30 degrés égale pi sur 6. À connaître par cœur !"}]},
+  ex:[
+   {type:"mcq",q:"90° en radians, c'est…",c:["π/2","π/4","2π","π"],a:0,explain:"90 = 180/2, donc 90° = π/2 radians."},
+   {type:"num",q:"π/3 radians en degrés = ?",a:"60",explain:"π/3 = 180°/3 = 60°."},
+   {type:"mcq",q:"Le cercle trigonométrique a pour rayon…",c:["π","1","2π","360"],a:1,explain:"Rayon 1, centre O : c'est ce qui rend cos et sin si simples à lire."},
+   {type:"mcq",q:"45° en radians, c'est…",c:["π/4","π/6","π/3","π/2"],a:0,explain:"45 = 180/4, donc 45° = π/4."},
+   {type:"num",q:"2π radians = ? degrés",a:"360",explain:"2π radians = un tour complet = 360°."},
+   {type:"mcq",q:"30° en radians, c'est…",c:["π/6","π/3","π/30","π/5"],a:0,explain:"30 = 180/6, donc 30° = π/6."}]},
+ {id:"c5s2",title:"Cosinus et sinus",desc:"Coordonnées du point M, valeurs remarquables, cos² + sin² = 1",
+  course:[
+   {h:"💡 L'idée",p:"Le point M associé au réel x a pour coordonnées (cos x ; sin x). Le cosinus est l'abscisse (lecture horizontale), le sinus est l'ordonnée (lecture verticale). Comme M reste sur le cercle de rayon 1 : −1 ≤ cos x ≤ 1 et −1 ≤ sin x ≤ 1."},
+   {h:"📋 Les valeurs remarquables et propriétés",method:[
+    "x = 0 : cos = 1, sin = 0.  x = π/2 : cos = 0, sin = 1.  x = π : cos = −1, sin = 0.",
+    "x = π/6 : cos = √3/2, sin = 1/2.  x = π/4 : cos = sin = √2/2.  x = π/3 : cos = 1/2, sin = √3/2.",
+    "L'identité fondamentale : cos²x + sin²x = 1 (c'est Pythagore sur le cercle !).",
+    "Périodicité : cos(x + 2π) = cos x et sin(x + 2π) = sin x — un tour complet ne change rien.",
+    "Parité : cos(−x) = cos x (le cosinus est pair), sin(−x) = −sin x (le sinus est impair)."],
+   tip:"Pour retenir les valeurs : sin(π/6), sin(π/4), sin(π/3) = √1/2, √2/2, √3/2. La suite √1, √2, √3 sur 2 ! Et le cosinus prend les mêmes valeurs en ordre inverse."}],
+  demo:{lines:["M(cos x ; sin x) sur le cercle de rayon 1","x = π/3 : cos = 1/2, sin = √3/2","Vérifions : (1/2)² + (√3/2)²","= 1/4 + 3/4 = 1  ✓","cos²x + sin²x = 1 pour TOUT x"],
+  steps:[
+   {show:[0],n:"Le point M associé au nombre x a pour abscisse le cosinus de x, et pour ordonnée le sinus de x. Lire cos et sin, c'est lire des coordonnées."},
+   {show:[1],n:"Prenons x égale pi sur 3, c'est-à-dire 60 degrés : le cosinus vaut un demi, et le sinus vaut racine de 3 sur 2."},
+   {show:[2,3],n:"Vérifions l'identité fondamentale : un demi au carré égale un quart, et racine de 3 sur 2 au carré égale trois quarts. Un quart plus trois quarts égale 1 !"},
+   {show:[4],glow:[4],n:"C'est vrai pour tout x : cosinus carré plus sinus carré égale 1. C'est simplement le théorème de Pythagore appliqué au cercle de rayon 1 !"}]},
+  ex:[
+   {type:"num",q:"cos(0) = ?",a:"1",explain:"En x = 0, le point M est en (1 ; 0) : cos = 1, sin = 0."},
+   {type:"num",q:"sin(π/2) = ?",a:"1",explain:"En π/2 (90°), M est au sommet du cercle, en (0 ; 1) : sin = 1."},
+   {type:"mcq",q:"Pour tout x, cos²x + sin²x = ?",c:["0","1","2","x"],a:1,explain:"Identité fondamentale : M est sur le cercle de rayon 1, donc (cos x)² + (sin x)² = 1."},
+   {type:"num",q:"cos(π) = ?",a:"-1",explain:"En π (demi-tour), M est en (−1 ; 0) : cos = −1."},
+   {type:"mcq",q:"sin(π/6) = ?",c:["1/2","√3/2","√2/2","0"],a:0,explain:"À 30°, le sinus vaut 1/2 (la suite √1/2, √2/2, √3/2 commence à π/6)."},
+   {type:"mcq",q:"cos(−x) = cos x : le cosinus est une fonction…",c:["paire","impaire","périodique de période π","négative"],a:0,explain:"Cosinus est pair : sa courbe est symétrique par rapport à l'axe des ordonnées."}]},
+ {id:"c5s3",title:"Les courbes sinusoïdales",desc:"Périodicité, parité, courbes de cos et sin",
+  course:[
+   {h:"💡 L'idée",p:"Les fonctions x ↦ cos x et x ↦ sin x sont définies sur ℝ. Un tour complet du cercle ne change rien : elles sont périodiques de période 2π. Leurs courbes sont des vagues infinies entre −1 et 1 : les sinusoïdes."},
+   {h:"📋 Les propriétés des courbes",method:[
+    "Périodicité : cos(x + 2π) = cos x et sin(x + 2π) = sin x. La courbe se répète tous les 2π.",
+    "Parité : cos(−x) = cos x → courbe de cos symétrique par rapport à l'axe des ordonnées. sin(−x) = −sin x → courbe de sin symétrique par rapport à l'origine.",
+    "Encadrement : −1 ≤ cos x ≤ 1 et −1 ≤ sin x ≤ 1 pour tout x.",
+    "Décalage : la courbe de sin est celle de cos décalée de π/2 vers la droite : sin x = cos(x − π/2)."],
+   tip:"Pour tracer une sinusoïde : place les points clés sur [0 ; 2π] (0, π/2, π, 3π/2, 2π), relie par une vague, puis répète le motif à l'infini."}],
+  demo:{lines:["sin(x + 2π) = sin x : période 2π","cos(−x) = cos x : cos est paire","sin(−x) = −sin x : sin est impaire","−1 ≤ cos x ≤ 1 et −1 ≤ sin x ≤ 1","les courbes : des vagues infinies (sinusoïdes)"],
+  steps:[
+   {show:[0],n:"Ajouter 2 pi à x, c'est faire un tour complet du cercle : on retombe sur le même point. Cosinus et sinus sont périodiques, de période 2 pi."},
+   {show:[1],n:"Changer x en moins x, c'est réfléchir le point par rapport à l'axe horizontal : l'abscisse ne change pas. Le cosinus est pair."},
+   {show:[2],n:"Mais l'ordonnée, elle, change de signe : le sinus est impair. Sa courbe est symétrique par rapport à l'origine."},
+   {show:[3],n:"Le point M reste sur le cercle de rayon 1 : cosinus et sinus restent toujours entre moins 1 et 1."},
+   {show:[4],glow:[4],n:"Résultat : les courbes de cosinus et sinus sont des vagues infinies, entre moins 1 et 1, qui se répètent tous les 2 pi. On les appelle des sinusoïdes."}]},
+  ex:[
+   {type:"mcq",q:"La période des fonctions cos et sin est…",c:["2π","π","1","360"],a:0,explain:"Un tour complet du cercle = 2π : cos(x + 2π) = cos x."},
+   {type:"mcq",q:"La fonction sinus est…",c:["impaire","paire","constante","toujours positive"],a:0,explain:"sin(−x) = −sin x : courbe symétrique par rapport à l'origine."},
+   {type:"num",q:"sin(π) = ?",a:"0",explain:"En π, M est en (−1 ; 0) : sin = 0."},
+   {type:"num",q:"cos(2π) = ?",a:"1",explain:"2π = un tour complet : on est revenu en (1 ; 0), cos = 1."},
+   {type:"mcq",q:"Pour tout x, sin x appartient à…",c:["[−1 ; 1]","[0 ; 1]","ℝ","[−π ; π]"],a:0,explain:"M reste sur le cercle de rayon 1 : −1 ≤ sin x ≤ 1."},
+   {type:"mcq",q:"La courbe de sin s'obtient à partir de celle de cos par…",c:["décalage de π/2 vers la droite","symétrie par rapport à l'axe des abscisses","dilatation verticale","aucun lien"],a:0,explain:"sin x = cos(x − π/2) : même vague, décalée de π/2."}]}
+]}
+,
+/* ============================================================
+   LEÇON 6 — LE PRODUIT SCALAIRE
+============================================================ */
+ch6:{icon:"🧭",title:"Le produit scalaire",desc:"Trois définitions, orthogonalité, théorème d'Al-Kashi.",
+ sections:[
+ {id:"c6s1",title:"Définir le produit scalaire",desc:"Avec l'angle, avec les coordonnées, avec la projection",
+  course:[
+   {h:"💡 L'idée",p:"Le produit scalaire u⃗·v⃗ est un NOMBRE (pas un vecteur !) qui mesure à quel point deux vecteurs pointent dans la même direction. Positif : ils vont plutôt dans le même sens. Négatif : plutôt opposés. Nul : perpendiculaires."},
+   {h:"📋 Les trois formules (choisir selon les données)",method:[
+    "Avec l'angle : u⃗·v⃗ = ‖u⃗‖ × ‖v⃗‖ × cos(u⃗, v⃗). Utile quand on connaît les longueurs et l'angle.",
+    "Avec les coordonnées : u⃗(x ; y) et v⃗(x' ; y') donnent u⃗·v⃗ = xx' + yy'. La plus rapide en repère !",
+    "Avec la projection : u⃗·v⃗ = OH × OA (mesures algébriques), où H est le projeté orthogonal.",
+    "Propriété clé : u⃗ ⊥ v⃗ ⟺ u⃗·v⃗ = 0. C'est LE test d'orthogonalité."],
+   tip:"Réflexe en repère : xx' + yy'. Deux multiplications, une addition, c'est tout. Si le résultat est 0, les vecteurs sont perpendiculaires."}],
+  demo:{lines:["u⃗(2 ; 3) et v⃗(4 ; 1)","u⃗·v⃗ = xx' + yy'","u⃗·v⃗ = 2×4 + 3×1 = 11","w⃗(1 ; 2) et z⃗(−2 ; 1)","w⃗·z⃗ = −2 + 2 = 0 → w⃗ ⊥ z⃗"],
+  steps:[
+   {show:[0,1],n:"Calculons le produit scalaire de u de coordonnées 2, 3, et v de coordonnées 4, 1. En repère orthonormé, la formule est : x x prime plus y y prime."},
+   {show:[2],n:"2 fois 4 égale 8, et 3 fois 1 égale 3. 8 plus 3 : le produit scalaire vaut 11. Positif : les vecteurs pointent plutôt dans la même direction."},
+   {show:[3],n:"Autre exemple : w de coordonnées 1, 2, et z de coordonnées moins 2, 1."},
+   {show:[4],glow:[4],n:"1 fois moins 2 égale moins 2, et 2 fois 1 égale 2. Moins 2 plus 2 égale zéro ! Produit scalaire nul : les vecteurs sont orthogonaux, c'est-à-dire perpendiculaires."}]},
+  ex:[
+   {type:"num",q:"u⃗(2 ; 3) et v⃗(4 ; 1). Calcule u⃗·v⃗ = ?",a:"11",explain:"u⃗·v⃗ = 2×4 + 3×1 = 8 + 3 = 11."},
+   {type:"mcq",q:"Deux vecteurs sont orthogonaux si et seulement si…",c:["leur produit scalaire vaut 1","leur produit scalaire vaut 0","ils ont la même norme","leurs coordonnées sont égales"],a:1,explain:"u⃗ ⊥ v⃗ ⟺ u⃗·v⃗ = 0. Le test d'orthogonalité par excellence."},
+   {type:"mcq",q:"Le produit scalaire de deux vecteurs est…",c:["un vecteur","un nombre réel","un angle","toujours positif"],a:1,explain:"C'est un nombre (un « scalaire »), qui peut être positif, négatif ou nul."},
+   {type:"num",q:"u⃗(5 ; −2) et v⃗(1 ; 3). Calcule u⃗·v⃗ = ?",a:"-1",explain:"5×1 + (−2)×3 = 5 − 6 = −1."},
+   {type:"mcq",q:"u⃗(6 ; −4) et v⃗(2 ; 3) sont…",c:["orthogonaux","colinéaires","égaux","opposés"],a:0,explain:"u⃗·v⃗ = 12 − 12 = 0 : orthogonaux."},
+   {type:"num",q:"u⃗(3 ; 0). Calcule u⃗·u⃗ = ?",a:"9",explain:"u⃗·u⃗ = 3² + 0² = 9 = ‖u⃗‖² : le carré scalaire est le carré de la norme."}]},
+ {id:"c6s2",title:"Al-Kashi et applications",desc:"Le théorème de Pythagore généralisé",
+  course:[
+   {h:"💡 L'idée",p:"Dans un triangle ABC quelconque (pas forcément rectangle !), le théorème d'Al-Kashi relie les trois côtés et un angle : a² = b² + c² − 2bc·cos(Â), où a = BC est le côté opposé à l'angle Â. Si  = 90°, cos  = 0 et on retrouve… Pythagore !"},
+   {h:"🗺️ La méthode",method:[
+    "J'identifie l'angle connu et le côté opposé à cet angle (celui qu'on cherche souvent).",
+    "J'écris Al-Kashi : (côté opposé)² = (somme des carrés des deux autres) − 2 × (produit des deux autres) × cos(angle).",
+    "Je calcule pas à pas, puis je prends la racine carrée.",
+    "Al-Kashi sert aussi à trouver un angle : cos(Â) = (b² + c² − a²) / 2bc."],
+   tip:"Al-Kashi = « Pythagore + correction d'angle ». Le terme −2bc·cos(Â) corrige le fait que le triangle n'est pas rectangle."}],
+  demo:{lines:["Triangle : b = 5, c = 7, Â = 60°","a² = b² + c² − 2bc·cos(Â)","a² = 25 + 49 − 2×5×7×cos(60°)","cos(60°) = 1/2 → a² = 74 − 35 = 39","a = √39 ≈ 6,24"],
+  steps:[
+   {show:[0],n:"Dans un triangle, je connais deux côtés, 5 et 7, et l'angle entre eux : 60 degrés. Je cherche le troisième côté."},
+   {show:[1],n:"J'applique Al-Kashi : a carré égale b carré plus c carré, moins 2 b c fois cosinus de l'angle."},
+   {show:[2],n:"Je remplace : 25 plus 49, moins 2 fois 5 fois 7 fois cosinus de 60 degrés."},
+   {show:[3],n:"Cosinus de 60 degrés égale un demi. Donc 74 moins 35 : a carré égale 39."},
+   {show:[4],glow:[4],n:"Le côté cherché vaut racine de 39, environ 6,24. Et si l'angle avait été droit, cosinus nul : on aurait retrouvé exactement Pythagore !"}]},
+  ex:[
+   {type:"mcq",q:"Dans le triangle ABC, le théorème d'Al-Kashi s'écrit…",c:["a² = b² + c² − 2bc·cos(Â)","a² = b² + c²","a = b + c − cos(Â)","a² = b² − c² + 2bc"],a:0,explain:"a² = b² + c² − 2bc·cos(Â), avec a le côté opposé à l'angle Â."},
+   {type:"num",q:"b = 5, c = 7, Â = 60° (cos = 1/2). Calcule a² = ?",a:"39",explain:"a² = 25 + 49 − 2×5×7×0,5 = 74 − 35 = 39."},
+   {type:"mcq",q:"Si Â = 90°, Al-Kashi devient…",c:["le théorème de Thalès","le théorème de Pythagore","la formule du discriminant","cos² + sin² = 1"],a:1,explain:"cos(90°) = 0 : le terme correctif disparaît, il reste a² = b² + c²."},
+   {type:"num",q:"b = 3, c = 4, Â = 90°. Calcule a² = ?",a:"25",explain:"cos(90°) = 0 : a² = 9 + 16 = 25. C'est Pythagore : a = 5."},
+   {type:"mcq",q:"Pour trouver un angle avec Al-Kashi, on utilise…",c:["cos(Â) = (b² + c² − a²)/2bc","cos(Â) = a² + b² + c²","cos(Â) = a/b","cos(Â) = 2bc/(b² + c²)"],a:0,explain:"On isole cos(Â) dans la formule d'Al-Kashi."},
+   {type:"num",q:"b = 2, c = 3, cos(Â) = 1/2. Calcule a² = ?",a:"7",explain:"a² = 4 + 9 − 2×2×3×0,5 = 13 − 6 = 7."}]}
+]},
+
+/* ============================================================
+   LEÇON 7 — GÉOMÉTRIE REPÉRÉE
+============================================================ */
+ch7:{icon:"🗺️",title:"Géométrie repérée",desc:"Droites et vecteur normal, équations de cercles.",
+ sections:[
+ {id:"c7s1",title:"Droites et vecteur normal",desc:"ax + by + c = 0, vecteur normal, vecteur directeur",
+  course:[
+   {h:"💡 L'idée",p:"Une droite peut s'écrire ax + by + c = 0 (équation cartésienne). La grande nouveauté de Première : le vecteur n⃗(a ; b) est NORMAL à la droite (perpendiculaire). Et le vecteur u⃗(−b ; a) en est un vecteur directeur (il suit la droite)."},
+   {h:"🗺️ La méthode",method:[
+    "Lire le vecteur normal : dans ax + by + c = 0, c'est direct : n⃗(a ; b). Pour 2x + 3y − 6 = 0 : n⃗(2 ; 3).",
+    "Lire un vecteur directeur : u⃗(−b ; a), en échangeant les coordonnées et en changeant un signe. Vérification : n⃗·u⃗ = −ab + ab = 0 ✓.",
+    "Vérifier qu'un point est sur la droite : je remplace ses coordonnées dans l'équation, je dois trouver 0.",
+    "Trouver l'équation d'une droite de normal n⃗(a ; b) passant par A : j'écris ax + by + c = 0 et je trouve c avec les coordonnées de A."],
+   tip:"Normal = perpendiculaire à la droite. Directeur = parallèle à la droite. Les deux se déduisent l'un de l'autre en échangeant les coordonnées et en changeant UN signe."}],
+  demo:{lines:["Droite d : 2x + 3y − 6 = 0","vecteur normal n⃗(2 ; 3)","vecteur directeur u⃗(−3 ; 2)","n⃗·u⃗ = −6 + 6 = 0 ✓","A(3 ; 0) : 2×3 + 3×0 − 6 = 0 → A ∈ d"],
+  steps:[
+   {show:[0],n:"Voici une droite d'équation cartésienne : 2 x plus 3 y moins 6 égale zéro."},
+   {show:[1],n:"Le vecteur normal se lit directement dans l'équation : ses coordonnées sont les coefficients de x et de y. Ici, n de coordonnées 2, 3. Il est perpendiculaire à la droite."},
+   {show:[2],n:"Pour un vecteur directeur, j'échange les coordonnées et je change un signe : u de coordonnées moins 3, 2. Il suit la direction de la droite."},
+   {show:[3],n:"Vérification : le produit scalaire de n et u : 2 fois moins 3 égale moins 6, plus 3 fois 2 égale 6. Total : zéro. Ils sont bien perpendiculaires !"},
+   {show:[4],glow:[4],n:"Et pour tester si le point A, de coordonnées 3, 0, est sur la droite : je remplace. 6 plus 0 moins 6 égale zéro : oui, A appartient à la droite !"}]},
+  ex:[
+   {type:"mcq",q:"Un vecteur normal à la droite 3x − y + 2 = 0 est…",c:["n⃗(3 ; −1)","n⃗(−1 ; 3)","n⃗(3 ; 1)","n⃗(1 ; 3)"],a:0,explain:"Dans ax + by + c = 0, n⃗(a ; b) : ici n⃗(3 ; −1)."},
+   {type:"mcq",q:"Un vecteur directeur de cette même droite 3x − y + 2 = 0 est…",c:["u⃗(1 ; 3)","u⃗(3 ; −1)","u⃗(−3 ; 1)","u⃗(1 ; −3)"],a:0,explain:"u⃗(−b ; a) = u⃗(1 ; 3). Vérification : n⃗·u⃗ = 3 − 3 = 0 ✓."},
+   {type:"mcq",q:"Le point B(1 ; 5) appartient-il à la droite 3x − y + 2 = 0 ?",c:["Oui","Non","Impossible à savoir","Seulement si x > 0"],a:0,explain:"3×1 − 5 + 2 = 0 ✓ : B est sur la droite."},
+   {type:"mcq",q:"Un vecteur normal à la droite x + 2y − 3 = 0 est…",c:["n⃗(1 ; 2)","n⃗(2 ; 1)","n⃗(−3 ; 0)","n⃗(2 ; −1)"],a:0,explain:"n⃗(a ; b) = n⃗(1 ; 2)."},
+   {type:"mcq",q:"La droite de vecteur normal n⃗(2 ; −1) passant par l'origine a pour équation…",c:["2x − y = 0","x − 2y = 0","2x + y = 0","2x − y + 1 = 0"],a:0,explain:"ax + by + c = 0 avec (a ; b) = (2 ; −1), et c = 0 car O(0 ; 0) est sur la droite."},
+   {type:"mcq",q:"Deux droites sont perpendiculaires si et seulement si leurs vecteurs normaux sont…",c:["orthogonaux","égaux","colinéaires","de même norme"],a:0,explain:"Droites perpendiculaires ⟺ leurs normales sont perpendiculaires ⟺ produit scalaire des normaux nul."}]},
+ {id:"c7s2",title:"Équation de cercle",desc:"(x−a)² + (y−b)² = r², forme développée",
+  course:[
+   {h:"💡 L'idée",p:"Un cercle de centre Ω(a ; b) et de rayon r est l'ensemble des points M(x ; y) situés à distance r de Ω. La distance au carré donne l'équation : (x − a)² + (y − b)² = r². C'est Pythagore, encore lui !"},
+   {h:"🗺️ La méthode : retrouver centre et rayon",method:[
+    "Forme réduite (x − a)² + (y − b)² = r² : je lis directement le centre Ω(a ; b) et le rayon r = √(r²).",
+    "Attention aux signes : (x + 2)² signifie a = −2 !",
+    "Forme développée x² + y² + …x + …y + … = 0 : je regroupe les x ensemble, les y ensemble, et je complète les carrés : x² − 4x = (x − 2)² − 4.",
+    "Je vérifie que le nombre à droite est positif : c'est r². S'il est négatif, ce n'est pas un cercle !"],
+   tip:"Compléter le carré : x² − 4x devient (x − 2)² − 4. On divise le coefficient de x par 2 pour trouver le nombre dans la parenthèse, puis on retire son carré."}],
+  demo:{lines:["x² + y² − 4x + 2y − 4 = 0","x² − 4x = (x − 2)² − 4","y² + 2y = (y + 1)² − 1","(x − 2)² + (y + 1)² − 9 = 0","(x − 2)² + (y + 1)² = 9","centre Ω(2 ; −1), rayon r = 3"],
+  steps:[
+   {show:[0],n:"Cette équation cache un cercle : x carré plus y carré moins 4 x plus 2 y moins 4 égale zéro. Trouvons son centre et son rayon."},
+   {show:[1],n:"Je complète le carré pour les x : x carré moins 4 x, c'est x moins 2 au carré, moins 4."},
+   {show:[2],n:"Pareil pour les y : y carré plus 2 y, c'est y plus 1 au carré, moins 1."},
+   {show:[3,4],n:"Je remplace et je regroupe les constantes : moins 4, moins 1, moins 4, ça fait moins 9. Je le passe à droite : l'équation devient x moins 2 au carré, plus y plus 1 au carré, égale 9."},
+   {show:[5],glow:[5],n:"Je lis le résultat : centre de coordonnées 2 et moins 1. Attention au signe : y PLUS 1 donne b égale MOINS 1. Et le rayon : racine de 9 égale 3."}]},
+  ex:[
+   {type:"num",q:"Le cercle (x − 1)² + (y + 2)² = 25 a pour rayon r = ?",a:"5",explain:"r² = 25 donc r = 5."},
+   {type:"mcq",q:"Le centre de ce cercle (x − 1)² + (y + 2)² = 25 est…",c:["Ω(1 ; −2)","Ω(−1 ; 2)","Ω(1 ; 2)","Ω(25 ; 0)"],a:0,explain:"(x − 1) → a = 1 ; (y + 2) = (y − (−2)) → b = −2."},
+   {type:"mcq",q:"L'équation du cercle de centre O(0 ; 0) et de rayon 2 est…",c:["x² + y² = 4","x² + y² = 2","x + y = 2","(x − 2)² + y² = 0"],a:0,explain:"(x − 0)² + (y − 0)² = 2², soit x² + y² = 4."},
+   {type:"num",q:"Le cercle x² + y² = 9 a pour rayon r = ?",a:"3",explain:"r² = 9 donc r = 3, centre O(0 ; 0)."},
+   {type:"num",q:"x² + y² − 6x = 0 s'écrit (x − 3)² + y² = 9. L'abscisse du centre est… ?",a:"3",explain:"Centre Ω(3 ; 0), rayon 3."},
+   {type:"mcq",q:"Le centre du cercle (x + 4)² + (y − 1)² = 16 est…",c:["Ω(−4 ; 1)","Ω(4 ; −1)","Ω(4 ; 1)","Ω(−4 ; −1)"],a:0,explain:"(x + 4) = (x − (−4)) → a = −4 ; (y − 1) → b = 1."}]}
+]},
+
+/* ============================================================
+   LEÇON 8 — PROBABILITÉS CONDITIONNELLES
+============================================================ */
+ch8:{icon:"🌳",title:"Probabilités conditionnelles",desc:"Arbres pondérés, probabilités totales, indépendance.",
+ sections:[
+ {id:"c8s1",title:"Probabilité conditionnelle et arbres",desc:"P_A(B), arbres pondérés, règles de calcul",
+  course:[
+   {h:"💡 L'idée",p:"La probabilité conditionnelle P_A(B) est la probabilité que B se réalise SACHANT que A s'est déjà réalisé. On restreint l'univers à A. Formule : P_A(B) = P(A ∩ B) / P(A). L'arbre pondéré rend tout ça visuel et presque automatique."},
+   {h:"📋 Les règles de l'arbre pondéré",method:[
+    "Premier niveau : les probabilités des événements de départ (A, Ā). Deuxième niveau : les probabilités CONDITIONNELLES sachant la branche d'où l'on vient.",
+    "Règle du produit : la probabilité d'un chemin = produit des probabilités de ses branches. P(A ∩ B) = P(A) × P_A(B).",
+    "Règle de la somme : les branches issues d'un même nœud totalisent toujours 1.",
+    "La probabilité d'un événement = somme des probabilités des chemins qui y mènent."],
+   tip:"Réflexe : dessine TOUJOURS l'arbre. 90 % des exercices de probabilité de Première se résolvent en lisant l'arbre correctement."}],
+  demo:{svg:`<svg viewBox="0 0 360 200" width="360">
+   <style>.a8{font:700 15px sans-serif;fill:#eef0ff}.a8g{font:700 13px sans-serif;fill:#ffc93c}.a8b{stroke:#7c5cff;stroke-width:2.5}</style>
+   <g id="a8-l1" class="anim-el">
+    <line x1="40" y1="100" x2="130" y2="45" class="a8b"/><line x1="40" y1="100" x2="130" y2="155" class="a8b"/>
+    <text class="a8" x="138" y="50">A</text><text class="a8" x="138" y="160">A̅</text>
+    <text class="a8g" x="65" y="58">0,3</text><text class="a8g" x="65" y="150">0,7</text></g>
+   <g id="a8-l2" class="anim-el">
+    <line x1="160" y1="42" x2="250" y2="20" class="a8b"/><line x1="160" y1="42" x2="250" y2="68" class="a8b"/>
+    <text class="a8" x="258" y="25">B</text><text class="a8" x="258" y="73">B̅</text>
+    <text class="a8g" x="192" y="20">0,4</text><text class="a8g" x="192" y="66">0,6</text></g>
+   <g id="a8-l3" class="anim-el">
+    <line x1="160" y1="152" x2="250" y2="130" class="a8b"/><line x1="160" y1="152" x2="250" y2="178" class="a8b"/>
+    <text class="a8" x="258" y="135">B</text><text class="a8" x="258" y="183">B̅</text>
+    <text class="a8g" x="192" y="130">0,2</text><text class="a8g" x="192" y="176">0,8</text></g>
+   <text id="a8-f" class="a8g anim-el" x="180" y="103">P(A∩B) = 0,3 × 0,4 = 0,12</text>
+  </svg>`,
+  steps:[
+   {show:["a8-l1"],n:"Premier niveau de l'arbre : l'événement A a une probabilité de 0,3, et son contraire 0,7. Remarque : 0,3 plus 0,7 égale 1, toujours !"},
+   {show:["a8-l2"],n:"Deuxième niveau : SI A s'est réalisé, alors B a une probabilité de 0,4. C'est une probabilité conditionnelle : P de B sachant A."},
+   {show:["a8-l3"],n:"Et si A ne s'est pas réalisé, B n'a plus que 0,2 de chances. Les conditions changent les probabilités !"},
+   {show:["a8-f"],glow:["a8-f"],n:"Règle du produit : pour suivre le chemin A puis B, je multiplie les branches. 0,3 fois 0,4 égale 0,12. C'est la probabilité de A inter B."}]},
+  ex:[
+   {type:"mcq",q:"P_A(B) se calcule par…",c:["P(A ∩ B) / P(A)","P(A) × P(B)","P(A) + P(B)","P(B) / P(A ∩ B)"],a:0,explain:"Probabilité de B sachant A : on divise P(A ∩ B) par P(A)."},
+   {type:"num",q:"P(A) = 0,3 et P_A(B) = 0,4. Calcule P(A ∩ B) = ? (écris 0.12 ou 0,12)",a:"0.12",explain:"Règle du produit : P(A ∩ B) = 0,3 × 0,4 = 0,12."},
+   {type:"num",q:"Sur un arbre, les branches issues d'un même nœud totalisent toujours… ?",a:"1",explain:"La somme des probabilités des branches d'un même nœud vaut 1 (certitude)."},
+   {type:"num",q:"P(A ∩ B) = 0,12 et P(A) = 0,3. Calcule P_A(B) = ? (écris 0.4)",a:"0.4",explain:"P_A(B) = P(A ∩ B)/P(A) = 0,12/0,3 = 0,4."},
+   {type:"mcq",q:"Sur la branche A̅, si P_A̅(B) = 0,2, alors P_A̅(B̅) = ?",c:["0,8","0,2","0,7","1"],a:0,explain:"Les branches d'un même nœud totalisent 1 : 1 − 0,2 = 0,8."},
+   {type:"num",q:"P(A) = 0,5 et P_A(B) = 0,6. Calcule P(A ∩ B) = ? (écris 0.3)",a:"0.3",explain:"Règle du produit : 0,5 × 0,6 = 0,3."}]},
+ {id:"c8s2",title:"Probabilités totales et indépendance",desc:"Formule des probabilités totales, événements indépendants",
+  course:[
+   {h:"💡 L'idée",p:"Pour calculer P(B) quand B peut arriver par plusieurs chemins, j'additionne tous les chemins de l'arbre qui mènent à B : c'est la formule des probabilités totales. P(B) = P(A ∩ B) + P(Ā ∩ B)."},
+   {h:"📋 L'indépendance",method:[
+    "Deux événements sont indépendants si la réalisation de l'un ne change pas la probabilité de l'autre : P_A(B) = P(B).",
+    "Critère pratique : A et B indépendants ⟺ P(A ∩ B) = P(A) × P(B).",
+    "Ne pas confondre : indépendants (l'un n'influence pas l'autre) et incompatibles (ne peuvent pas arriver ensemble, A ∩ B = ∅).",
+    "Application : lancers de dés successifs, tirages AVEC remise → indépendance. Tirages SANS remise → pas d'indépendance !"],
+   tip:"Test rapide d'indépendance : est-ce que P(A) × P(B) = P(A ∩ B) ? Si oui, indépendants. Sinon, non."}],
+  demo:{lines:["P(A)=0,3  P_A(B)=0,4  P_A̅(B)=0,2","chemin 1 : A puis B : 0,3×0,4 = 0,12","chemin 2 : A̅ puis B : 0,7×0,2 = 0,14","P(B) = 0,12 + 0,14 = 0,26","Test : P(A)×P(B) = 0,078 ≠ 0,12","→ A et B ne sont PAS indépendants"],
+  steps:[
+   {show:[0],n:"Reprenons notre arbre : A a une probabilité de 0,3. B a une probabilité de 0,4 si A s'est réalisé, et 0,2 sinon. Quelle est la probabilité totale de B ?"},
+   {show:[1],n:"B peut arriver par deux chemins. Premier chemin : A puis B. Probabilité : 0,3 fois 0,4, égale 0,12."},
+   {show:[2],n:"Deuxième chemin : non A, puis B. Probabilité : 0,7 fois 0,2, égale 0,14."},
+   {show:[3],n:"Formule des probabilités totales : j'additionne tous les chemins qui mènent à B. 0,12 plus 0,14 : P de B égale 0,26."},
+   {show:[4,5],glow:[5],n:"Testons l'indépendance : P de A fois P de B égale 0,3 fois 0,26, soit 0,078. Mais P de A inter B vaut 0,12. Différent ! Donc A et B ne sont pas indépendants : A influence B."}]},
+  ex:[
+   {type:"num",q:"P(A∩B) = 0,12 et P(A̅∩B) = 0,14. Calcule P(B) = ? (écris 0.26)",a:"0.26",explain:"Probabilités totales : P(B) = 0,12 + 0,14 = 0,26."},
+   {type:"num",q:"A et B indépendants, P(A) = 0,5 et P(B) = 0,4. P(A ∩ B) = ? (écris 0.2)",a:"0.2",explain:"Indépendance : P(A ∩ B) = P(A) × P(B) = 0,5 × 0,4 = 0,2."},
+   {type:"mcq",q:"A et B sont indépendants si et seulement si…",c:["P(A ∩ B) = P(A) × P(B)","A ∩ B = ∅","P(A) = P(B)","P(A ∪ B) = 1"],a:0,explain:"C'est le critère d'indépendance. A ∩ B = ∅ définit l'incompatibilité, pas l'indépendance !"},
+   {type:"num",q:"P(A) = 0,4, P_A(B) = 0,5, P_A̅(B) = 0,3. Calcule P(B) = ? (écris 0.38)",a:"0.38",explain:"P(B) = 0,4×0,5 + 0,6×0,3 = 0,2 + 0,18 = 0,38."},
+   {type:"mcq",q:"Deux tirages successifs AVEC remise sont…",c:["indépendants","incompatibles","impossibles","toujours identiques"],a:0,explain:"Avec remise, l'urne revient à l'état initial : le 1er tirage n'influence pas le 2e."},
+   {type:"mcq",q:"A et B incompatibles signifie…",c:["A ∩ B = ∅","P(A) = P(B)","A et B indépendants","P(A ∪ B) = 0"],a:0,explain:"Incompatibles = ne peuvent pas se réaliser ensemble. À ne pas confondre avec indépendants !"}]}
+]},
+
+/* ============================================================
+   LEÇON 9 — VARIABLES ALÉATOIRES
+============================================================ */
+ch9:{icon:"🎰",title:"Variables aléatoires",desc:"Loi de probabilité, espérance, variance et écart-type.",
+ sections:[
+ {id:"c9s1",title:"Loi d'une variable aléatoire",desc:"Définition, tableau de loi, somme égale à 1",
+  course:[
+   {h:"💡 L'idée",p:"Une variable aléatoire X associe un nombre à chaque issue d'une expérience aléatoire : le gain d'un jeu, le nombre de piles obtenus… Donner la LOI de X, c'est dresser le tableau de toutes les valeurs possibles avec leurs probabilités."},
+   {h:"🗺️ La méthode : dresser une loi de probabilité",method:[
+    "Je liste TOUTES les valeurs possibles de X : x₁, x₂, …, xₙ.",
+    "Pour chaque valeur, je calcule sa probabilité P(X = xᵢ), souvent en comptant les issues favorables.",
+    "Je vérifie : la somme de toutes les probabilités doit faire exactement 1. Sinon, erreur quelque part !",
+    "Je peux alors répondre à des questions comme P(X ≥ 5) en additionnant les probabilités concernées."],
+   tip:"« La somme fait 1 » est aussi une technique : si une probabilité est inconnue dans le tableau, elle vaut 1 moins toutes les autres."}],
+  demo:{lines:["Jeu : mise 2 €, on lance un dé","6 → gain 10 € ; pair (2,4) → 2 € ; sinon 0 €","X = gain : valeurs 0, 2, 10","P(X=10)=1/6  P(X=2)=2/6  P(X=0)=3/6","Somme : 1/6 + 2/6 + 3/6 = 6/6 = 1 ✓"],
+  steps:[
+   {show:[0,1],n:"Un jeu de dé : si je fais 6, je gagne 10 euros. Si je fais un autre nombre pair, 2 ou 4, je gagne 2 euros. Sinon, rien."},
+   {show:[2],n:"La variable aléatoire X est le gain. Ses valeurs possibles : 0, 2, ou 10 euros."},
+   {show:[3],n:"Je compte les issues : le 6, c'est 1 chance sur 6. Les pairs 2 et 4 : 2 chances sur 6. Les impairs 1, 3, 5 : 3 chances sur 6."},
+   {show:[4],glow:[4],n:"Vérification indispensable : 1 sixième plus 2 sixièmes plus 3 sixièmes égale 6 sixièmes, égale 1. La loi est complète et correcte !"}]},
+  ex:[
+   {type:"num",q:"La somme des probabilités d'une loi de probabilité vaut toujours… ?",a:"1",explain:"Toutes les valeurs possibles couvrent la totalité des cas : somme = 1."},
+   {type:"mcq",q:"X prend les valeurs 1, 2, 3 avec P(X=1) = 0,5 et P(X=2) = 0,3. Alors P(X=3) = ?",c:["0,2","0,8","0,3","Impossible à savoir"],a:0,explain:"P(X=3) = 1 − 0,5 − 0,3 = 0,2."},
+   {type:"mcq",q:"Avec la loi de la démonstration, P(X ≥ 2) = ?",c:["3/6","2/6","1/6","5/6"],a:0,explain:"P(X ≥ 2) = P(X=2) + P(X=10) = 2/6 + 1/6 = 3/6 = 1/2."},
+   {type:"num",q:"X prend 3 valeurs avec P = 0,1 ; 0,4 et p. Calcule p = ? (écris 0.5)",a:"0.5",explain:"p = 1 − 0,1 − 0,4 = 0,5."},
+   {type:"mcq",q:"X = nombre de « pile » sur 2 lancers d'une pièce. Ses valeurs possibles sont…",c:["0, 1, 2","1, 2","0, 2","0, 1, 2, 3"],a:0,explain:"On peut obtenir 0 pile, 1 pile ou 2 piles."},
+   {type:"mcq",q:"Avec la loi de la démonstration, P(X = 0) = ?",c:["3/6","1/6","2/6","0"],a:0,explain:"Les impairs 1, 3, 5 donnent un gain nul : 3 chances sur 6."}]},
+ {id:"c9s2",title:"Espérance, variance, écart-type",desc:"Valeur moyenne et dispersion d'une variable aléatoire",
+  course:[
+   {h:"💡 L'idée",p:"L'espérance E(X) est la moyenne des valeurs de X pondérées par leurs probabilités : ce qu'on gagnerait EN MOYENNE en répétant le jeu un très grand nombre de fois. La variance V(X) et l'écart-type σ = √V mesurent la dispersion autour de cette moyenne."},
+   {h:"🗺️ La méthode",method:[
+    "Espérance : E(X) = x₁p₁ + x₂p₂ + ⋯ + xₙpₙ. Chaque valeur multipliée par sa probabilité, puis on additionne.",
+    "Interprétation : un jeu est favorable au joueur si E(gain net) > 0, équitable si E = 0, défavorable si E < 0.",
+    "Variance : V(X) = E(X²) − [E(X)]², la moyenne des carrés moins le carré de la moyenne.",
+    "Écart-type : σ(X) = √V(X). Même unité que X, il mesure l'ampleur typique des écarts à la moyenne."],
+   tip:"L'espérance d'une loterie est presque toujours négative pour le joueur : c'est comme ça que la Française des Jeux gagne sa vie. Les maths protègent ton portefeuille !"}],
+  demo:{lines:["Loi : X = 0 (3/6), 2 (2/6), 10 (1/6)","E(X) = 0×3/6 + 2×2/6 + 10×1/6","E(X) = 0 + 4/6 + 10/6 = 14/6 ≈ 2,33 €","Mise = 2 € → gain net moyen ≈ +0,33 €","E &gt; mise : le jeu est favorable !"],
+  steps:[
+   {show:[0],n:"Reprenons notre jeu de dé : X vaut 0 avec 3 chances sur 6, 2 euros avec 2 chances sur 6, et 10 euros avec 1 chance sur 6."},
+   {show:[1],n:"L'espérance : chaque valeur multipliée par sa probabilité. 0 fois 3 sixièmes, plus 2 fois 2 sixièmes, plus 10 fois 1 sixième."},
+   {show:[2],n:"Calcul : 0 plus 4 sixièmes plus 10 sixièmes, égale 14 sixièmes, environ 2 euros 33. En jouant très longtemps, je gagne en moyenne 2,33 euros par partie."},
+   {show:[3,4],glow:[4],n:"Mais la mise était de 2 euros : le gain net moyen est de plus 33 centimes par partie. Espérance positive : ce jeu est favorable au joueur. Rare dans la vraie vie !"}]},
+  ex:[
+   {type:"mcq",q:"X vaut 1 avec probabilité 0,5 et 3 avec probabilité 0,5. E(X) = ?",c:["2","1,5","3","4"],a:0,explain:"E(X) = 1×0,5 + 3×0,5 = 0,5 + 1,5 = 2."},
+   {type:"mcq",q:"Un jeu est favorable au joueur quand…",c:["E(gain net) > 0","E(gain net) = 0","la variance est grande","on gagne à chaque fois"],a:0,explain:"Espérance de gain net positive = en moyenne, on gagne de l'argent sur le long terme."},
+   {type:"mcq",q:"L'écart-type σ(X) mesure…",c:["la valeur maximale de X","la dispersion des valeurs autour de l'espérance","la probabilité la plus forte","le nombre de valeurs"],a:1,explain:"σ = √V(X) : plus il est grand, plus les valeurs s'écartent de la moyenne — plus le jeu est risqué."},
+   {type:"num",q:"X vaut 0 avec probabilité 0,5 et 10 avec probabilité 0,5. E(X) = ?",a:"5",explain:"E(X) = 0×0,5 + 10×0,5 = 5."},
+   {type:"mcq",q:"Un jeu est équitable quand…",c:["E(gain net) = 0","E(gain net) &gt; 0","la variance est nulle","on gagne une fois sur deux"],a:0,explain:"Espérance de gain net nulle : sur le long terme, personne ne gagne ni ne perd."},
+   {type:"mcq",q:"Mise 3 €, E(gain brut) = 2,50 €. Ce jeu est…",c:["défavorable au joueur","favorable au joueur","équitable","impossible à jouer"],a:0,explain:"Gain net moyen = 2,50 − 3 = −0,50 € par partie : défavorable."}]}
+]},
+
+/* ============================================================
+   LEÇON 10 — ÉTUDE DE FONCTIONS
+============================================================ */
+ch10:{icon:"🔀",title:"Étude de fonctions",desc:"Fonctions de référence, fonctions associées et variations.",
+ sections:[
+ {id:"c10s1",title:"Les fonctions de référence",desc:"x², x³, 1/x, √x : domaines, variations, courbes",
+  course:[
+   {h:"💡 L'idée",p:"Quatre courbes à connaître comme sa poche : la parabole (x²), la cubique (x³), l'hyperbole (1/x) et la demi-parabole couchée (√x). Toutes les fonctions du programme se construisent à partir d'elles."},
+   {h:"📋 La carte d'identité de chaque fonction",method:[
+    "x ↦ x² : définie sur ℝ, décroissante sur ]−∞ ; 0], croissante sur [0 ; +∞[. Courbe : parabole, minimum en 0.",
+    "x ↦ x³ : définie sur ℝ, strictement croissante sur tout ℝ. Courbe symétrique par rapport à l'origine.",
+    "x ↦ 1/x : définie sur ℝ* (jamais en 0 !), décroissante sur chaque intervalle. Courbe : hyperbole.",
+    "x ↦ √x : définie sur [0 ; +∞[ seulement, strictement croissante.",
+    "Positions relatives sur ]0 ; 1[ : x³ &lt; x² &lt; x. Sur ]1 ; +∞[ : x &lt; x² &lt; x³. Les courbes se croisent en 0 et en 1 !"],
+   tip:"Pour retrouver une position relative, teste x = 1/2 : (1/2)³ = 1/8 &lt; (1/2)² = 1/4 &lt; 1/2. Un exemple bien choisi permet de vérifier en 10 secondes."}],
+  demo:{lines:["x² : ↘ sur ]−∞;0] puis ↗ sur [0;+∞[","x³ : ↗ sur ℝ tout entier","1/x : définie sur ℝ*, hyperbole ↘","√x : définie sur [0;+∞[, ↗","sur ]0;1[ : x³ &lt; x² &lt; x","test x = 1/2 : 1/8 &lt; 1/4 &lt; 1/2 ✓"],
+  steps:[
+   {show:[0],n:"La fonction carré : elle descend jusqu'en zéro, puis remonte. Sa courbe est la parabole, avec un minimum en zéro."},
+   {show:[1],n:"La fonction cube : strictement croissante sur R tout entier, sans jamais redescendre. Sa courbe est symétrique par rapport à l'origine."},
+   {show:[2],n:"La fonction inverse : attention, elle n'est pas définie en zéro ! Elle décroît sur chaque moitié de son domaine. Sa courbe est l'hyperbole."},
+   {show:[3],n:"La fonction racine carrée : définie seulement pour les nombres positifs ou nuls, strictement croissante."},
+   {show:[4,5],glow:[4],n:"Entre 0 et 1, surprise : le cube est plus petit que le carré, lui-même plus petit que x. Vérifie avec un demi : un huitième, plus petit qu'un quart, plus petit qu'un demi !"}]},
+  ex:[
+   {type:"mcq",q:"L'ensemble de définition de x ↦ √x est…",c:["[0 ; +∞[","ℝ","ℝ*","]0 ; 1["],a:0,explain:"On ne prend la racine carrée que d'un nombre positif ou nul."},
+   {type:"mcq",q:"L'ensemble de définition de x ↦ 1/x est…",c:["ℝ privé de 0","ℝ","[0 ; +∞[","ℝ privé de 1"],a:0,explain:"Division par zéro interdite : ℝ* = ℝ privé de 0."},
+   {type:"mcq",q:"La fonction carré est décroissante sur…",c:["]−∞ ; 0]","[0 ; +∞[","ℝ","]0 ; 1["],a:0,explain:"Elle descend jusqu'à son minimum en 0, puis remonte."},
+   {type:"mcq",q:"Sur ]0 ; 1[, le bon classement est…",c:["x³ &lt; x² &lt; x","x &lt; x² &lt; x³","x² &lt; x³ &lt; x","x³ = x² = x"],a:0,explain:"Élever un nombre entre 0 et 1 à une puissance le rend plus petit. Teste x = 1/2 !"},
+   {type:"mcq",q:"La courbe de la fonction inverse s'appelle…",c:["une hyperbole","une parabole","une sinusoïde","une droite"],a:0,explain:"Deux branches symétriques par rapport à l'origine : l'hyperbole."},
+   {type:"num",q:"Calcule (−2)³ = ?",a:"-8",explain:"(−2)³ = −2 × −2 × −2 = −8 : le cube conserve le signe."}]},
+ {id:"c10s2",title:"Les fonctions associées",desc:"Variations de u + k, λu, √u et 1/u",
+  course:[
+   {h:"💡 L'idée",p:"À partir d'une fonction u dont on connaît les variations, on peut déduire SANS CALCUL les variations de u + k, λu, √u et 1/u. C'est un jeu de transformations : certaines conservent le sens de variation, d'autres l'inversent."},
+   {h:"📋 Les règles de transformation",method:[
+    "u + k (ajouter une constante) : MÊMES variations que u. La courbe glisse verticalement, sa forme ne change pas.",
+    "λu avec λ &gt; 0 : mêmes variations. λu avec λ &lt; 0 : variations INVERSÉES (la courbe se retourne).",
+    "√u : mêmes variations que u, sur les intervalles où u ≥ 0.",
+    "1/u : variations INVERSÉES de u, sur les intervalles où u garde un signe constant.",
+    "Stratégie d'exercice : je pars des variations de u, j'applique la règle, je conclus. Zéro calcul de dérivée !"],
+   tip:"Logique de l'inverse : quand u grandit, 1/u rapetisse (plus le gâteau est partagé, plus les parts sont petites). D'où l'inversion des variations."}],
+  demo:{lines:["u croissante sur I. Alors :","u + 5 : croissante (translation)","−2u : décroissante (λ &lt; 0 inverse)","√u : croissante (là où u ≥ 0)","1/u : décroissante (u de signe constant)","+k et λ&gt;0 conservent ; λ&lt;0 et 1/u inversent"],
+  steps:[
+   {show:[0],n:"Point de départ : une fonction u croissante sur un intervalle. Déduisons les variations de ses fonctions associées, sans aucun calcul."},
+   {show:[1],n:"u plus 5 : j'ajoute une constante. La courbe monte de 5 unités, mais sa forme ne change pas : toujours croissante."},
+   {show:[2],n:"Moins 2 u : je multiplie par un nombre négatif. La courbe se retourne : les variations s'inversent. Décroissante !"},
+   {show:[3],n:"Racine de u : la racine carrée est croissante, elle respecte l'ordre. Mêmes variations que u, là où u est positive."},
+   {show:[4,5],glow:[5],n:"Un sur u : l'inverse retourne l'ordre. Quand u grandit, un sur u rapetisse : variations inversées. Bilan : ajouter une constante et multiplier par un positif conservent ; multiplier par un négatif et inverser retournent."}]},
+  ex:[
+   {type:"mcq",q:"u est croissante sur I. Alors u + 5 est…",c:["croissante sur I","décroissante sur I","constante","impossible à savoir"],a:0,explain:"Ajouter une constante ne change pas les variations."},
+   {type:"mcq",q:"u est croissante sur I. Alors −2u est…",c:["décroissante sur I","croissante sur I","constante","positive"],a:0,explain:"λ = −2 &lt; 0 : les variations s'inversent."},
+   {type:"mcq",q:"√u a les mêmes variations que u…",c:["sur les intervalles où u ≥ 0","partout","nulle part","seulement si u est croissante"],a:0,explain:"√u n'existe que si u ≥ 0, et la racine carrée conserve l'ordre."},
+   {type:"mcq",q:"u est décroissante et strictement positive sur I. Alors 1/u est…",c:["croissante sur I","décroissante sur I","nulle","négative"],a:0,explain:"L'inverse retourne les variations : u ↘ donne 1/u ↗."},
+   {type:"num",q:"u(x) = x² + 1 a pour minimum 1. Le maximum de 1/u vaut… ?",a:"1",explain:"1/u est maximal quand u est minimal : 1/1 = 1."},
+   {type:"mcq",q:"Quelle transformation inverse les variations ?",c:["multiplier par −3","ajouter 100","prendre la racine √u","multiplier par 2"],a:0,explain:"Seuls λ &lt; 0 et le passage à l'inverse retournent les variations."}]}
+]},
+
+/* ============================================================
+   ÉVALUATIONS TYPE EXAMEN — format des évaluations communes (ex-E3C)
+============================================================ */
+ex1:{icon:"📝",title:"Évaluation n°1",desc:"Format évaluation commune · Second degré, suites, dérivation, trigo, probabilités.",
+ sections:[
+ {id:"e1s1",title:"Sujet complet — 10 questions",desc:"Barème /20 · Calculatrice autorisée · ~45 min",
+  course:[
+   {h:"📋 Consignes",p:"Sujet dans le format des évaluations communes de Première (ex-E3C) : un QCM et des questions calculatoires balayant plusieurs chapitres. Chaque question vaut 2 points. Travaille au brouillon comme en examen, puis valide ta réponse. Vise 3 étoiles !",
+    method:["Lis chaque question deux fois avant de répondre.","Au brouillon : pose le calcul complet, comme si tu rédigeais une copie.","Les thèmes : second degré, suites, dérivation, exponentielle, trigonométrie, produit scalaire, probabilités.","Note sur 20 : chaque bonne réponse vaut 2 points."]}],
+  ex:[
+   {type:"mcq",q:"[Second degré] La forme canonique de f(x) = x² − 6x + 5 est…",c:["(x − 3)² − 4","(x − 6)² + 5","(x + 3)² − 4","(x − 3)² + 4"],a:0,explain:"α = 6/2 = 3, β = f(3) = 9 − 18 + 5 = −4."},
+   {type:"num",q:"[Second degré] Pour x² − x − 6 = 0, calcule Δ = ?",a:"25",explain:"Δ = 1 + 24 = 25."},
+   {type:"mcq",q:"[Second degré] Les solutions de x² − x − 6 = 0 sont…",c:["−2 et 3","2 et −3","1 et 6","−1 et 6"],a:0,explain:"x = (1 ± 5)/2 : x₁ = −2 et x₂ = 3."},
+   {type:"num",q:"[Suites] Suite arithmétique : u₀ = 7 et r = −2. Calcule u₁₀ = ?",a:"-13",explain:"u₁₀ = 7 + 10×(−2) = −13."},
+   {type:"mcq",q:"[Dérivation] La dérivée de f(x) = 2x³ est…",c:["6x²","2x²","3x²","6x³"],a:0,explain:"(2x³)' = 2 × 3x² = 6x²."},
+   {type:"num",q:"[Dérivation] f(x) = x² + 3x. Calcule f'(1) = ?",a:"5",explain:"f'(x) = 2x + 3, donc f'(1) = 5."},
+   {type:"mcq",q:"[Exponentielle] e²ˣ × e³ = ?",c:["e²ˣ⁺³","e⁶ˣ","e²ˣ⁻³","2e³ˣ"],a:0,explain:"On additionne les exposants : e²ˣ⁺³."},
+   {type:"num",q:"[Trigonométrie] cos(π/3) = ? (écris 0.5)",a:"0.5",explain:"cos(60°) = 1/2."},
+   {type:"num",q:"[Produit scalaire] u⃗(3 ; −1) et v⃗(2 ; 4). Calcule u⃗·v⃗ = ?",a:"2",explain:"3×2 + (−1)×4 = 6 − 4 = 2."},
+   {type:"mcq",q:"[Probabilités] P(A) = 0,6 et P_A(B) = 0,5. Alors P(A ∩ B) = ?",c:["0,3","1,1","0,1","0,83"],a:0,explain:"Règle du produit : 0,6 × 0,5 = 0,3."}]}
+]},
+ex2:{icon:"📝",title:"Évaluation n°2",desc:"Format évaluation commune · Signe du trinôme, suites géométriques, tangente, géométrie repérée.",
+ sections:[
+ {id:"e2s1",title:"Sujet complet — 10 questions",desc:"Barème /20 · Calculatrice autorisée · ~45 min",
+  course:[
+   {h:"📋 Consignes",p:"Deuxième sujet type examen. Les questions mélangent volontairement les chapitres, comme le jour J : c'est en changeant de thème à chaque question qu'on vérifie qu'on maîtrise vraiment.",
+    method:["Chaque bonne réponse vaut 2 points, vise au moins 12/20.","Thèmes : second degré, suites, dérivation, exponentielle, trigonométrie, géométrie repérée, variables aléatoires.","Refais l'évaluation jusqu'à obtenir 3 étoiles : c'est la meilleure révision qui existe."]}],
+  ex:[
+   {type:"num",q:"[Second degré] f(x) = 3x² − 12x + 5. L'abscisse du sommet : α = ?",a:"2",explain:"α = −b/2a = 12/6 = 2."},
+   {type:"mcq",q:"[Second degré] Le trinôme −2x² + 8 (racines −2 et 2) est positif…",c:["sur ]−2 ; 2[","à l'extérieur des racines","nulle part","sur ℝ"],a:0,explain:"a = −2 &lt; 0 : signe de −a (positif) entre les racines."},
+   {type:"num",q:"[Suites] Suite géométrique : u₀ = 2 et q = 3. Calcule u₄ = ?",a:"162",explain:"u₄ = 2 × 3⁴ = 2 × 81 = 162."},
+   {type:"num",q:"[Suites] Calcule 1 + 2 + 3 + ⋯ + 50 = ?",a:"1275",explain:"50 × 51 / 2 = 1275."},
+   {type:"mcq",q:"[Dérivation] L'équation de la tangente en a est…",c:["y = f'(a)(x − a) + f(a)","y = f(a)(x − a) + f'(a)","y = f'(a)·x","y = f'(x)(x − a)"],a:0,explain:"Pente f'(a), passe par (a ; f(a))."},
+   {type:"num",q:"[Dérivation] f(x) = x³. Calcule f'(2) = ?",a:"12",explain:"f'(x) = 3x², f'(2) = 12."},
+   {type:"num",q:"[Exponentielle] Résous eˣ = e⁻². x = ?",a:"-2",explain:"exp strictement croissante : x = −2."},
+   {type:"num",q:"[Trigonométrie] sin(0) = ?",a:"0",explain:"En 0, M est en (1 ; 0) : sin = 0."},
+   {type:"mcq",q:"[Géométrie repérée] Un vecteur normal à 5x − 2y + 1 = 0 est…",c:["n⃗(5 ; −2)","n⃗(−2 ; 5)","n⃗(5 ; 2)","n⃗(1 ; 0)"],a:0,explain:"n⃗(a ; b) = n⃗(5 ; −2)."},
+   {type:"num",q:"[Variables aléatoires] X : 1 (p=0,2), 2 (p=0,3), 3 (p=0,5). E(X) = ? (écris 2.3)",a:"2.3",explain:"E(X) = 0,2 + 0,6 + 1,5 = 2,3."}]}
+]},
+ex3:{icon:"📝",title:"Évaluation n°3",desc:"Format évaluation commune · Racine double, pourcentages, variations, cercles, indépendance.",
+ sections:[
+ {id:"e3s1",title:"Sujet complet — 10 questions",desc:"Barème /20 · Calculatrice autorisée · ~45 min",
+  course:[
+   {h:"📋 Consignes",p:"Troisième sujet type examen, avec les grands classiques que les correcteurs adorent : racine double, évolution en pourcentage, lien dérivée-variations, équation de cercle et indépendance.",
+    method:["Attention aux pièges signalés dans les leçons : b² toujours positif, signes du centre d'un cercle, indépendant ≠ incompatible.","Thèmes : second degré, suites, dérivation, fonctions associées, exponentielle, trigonométrie, géométrie repérée, probabilités.","2 points par question."]}],
+  ex:[
+   {type:"mcq",q:"[Second degré] x² + 4x + 4 = 0 admet…",c:["une racine double","deux racines distinctes","aucune solution","une infinité de solutions"],a:0,explain:"Δ = 16 − 16 = 0 : racine double."},
+   {type:"num",q:"[Second degré] Cette racine double vaut x₀ = ?",a:"-2",explain:"x₀ = −b/2a = −4/2 = −2. En effet x² + 4x + 4 = (x + 2)²."},
+   {type:"mcq",q:"[Suites] La suite uₙ = 5 × 2ⁿ est…",c:["géométrique de raison 2","arithmétique de raison 2","géométrique de raison 5","ni l'une ni l'autre"],a:0,explain:"uₙ₊₁/uₙ = 2 : géométrique de raison 2, premier terme 5."},
+   {type:"num",q:"[Suites] Un prix de 100 € baisse de 10 % par an. Prix après 1 an = ?",a:"90",explain:"100 × 0,90 = 90 € : suite géométrique de raison 0,9."},
+   {type:"num",q:"[Dérivation] f(x) = 2x² − 4x + 1. f'(x) = 4x − 4 s'annule en x = ?",a:"1",explain:"4x − 4 = 0 ⟺ x = 1 : minimum de la parabole."},
+   {type:"mcq",q:"[Fonctions associées] u est croissante et strictement positive. Alors 1/u est…",c:["décroissante","croissante","constante","nulle"],a:0,explain:"L'inverse retourne les variations."},
+   {type:"mcq",q:"[Exponentielle] Pour tous réels a et b, eᵃ × eᵇ = ?",c:["eᵃ⁺ᵇ","eᵃᵇ","eᵃ⁻ᵇ","eᵃ + eᵇ"],a:0,explain:"La propriété fondamentale : l'addition des exposants."},
+   {type:"num",q:"[Trigonométrie] Pour tout x, cos²x + sin²x = ?",a:"1",explain:"Identité fondamentale (Pythagore sur le cercle unité)."},
+   {type:"num",q:"[Géométrie repérée] Le cercle x² + y² = 25 a pour rayon… ?",a:"5",explain:"r² = 25 → r = 5."},
+   {type:"mcq",q:"[Probabilités] A et B sont indépendants si et seulement si…",c:["P(A ∩ B) = P(A) × P(B)","A ∩ B = ∅","P(A) + P(B) = 1","P_A(B) = P(A)"],a:0,explain:"Le critère d'indépendance du cours."}]}
+]},
+ex4:{icon:"📝",title:"Évaluation n°4",desc:"Format évaluation commune · Discriminant, suites, extremums, Al-Kashi, probabilités totales.",
+ sections:[
+ {id:"e4s1",title:"Sujet complet — 10 questions",desc:"Barème /20 · Calculatrice autorisée · ~45 min",
+  course:[
+   {h:"📋 Consignes",p:"Quatrième sujet type examen, un cran plus calculatoire : résolution complète du second degré, recherche de terme initial d'une suite, points critiques, Al-Kashi et formule des probabilités totales.",
+    method:["Pose chaque calcul en entier au brouillon avant de répondre.","Thèmes : second degré, suites, dérivation, fonctions associées, exponentielle, trigonométrie, produit scalaire, probabilités.","2 points par question, vise le sans-faute."]}],
+  ex:[
+   {type:"num",q:"[Second degré] Pour 2x² − 7x + 3 = 0, calcule Δ = ?",a:"25",explain:"Δ = 49 − 24 = 25."},
+   {type:"mcq",q:"[Second degré] Les solutions de 2x² − 7x + 3 = 0 sont…",c:["3 et 1/2","−3 et −1/2","7 et 3","2 et 3"],a:0,explain:"x = (7 ± 5)/4 : x₁ = 1/2 et x₂ = 3."},
+   {type:"num",q:"[Suites] Suite arithmétique : u₅ = 17 et r = 3. Calcule u₀ = ?",a:"2",explain:"u₀ = u₅ − 5r = 17 − 15 = 2."},
+   {type:"mcq",q:"[Dérivation] Si f'(x) &lt; 0 sur I, alors f est…",c:["décroissante sur I","croissante sur I","constante sur I","positive sur I"],a:0,explain:"Dérivée négative = fonction décroissante."},
+   {type:"num",q:"[Dérivation] f(x) = x³ − 3x². f'(x) = 3x² − 6x s'annule en 0 et en x = ?",a:"2",explain:"3x(x − 2) = 0 : x = 0 ou x = 2."},
+   {type:"mcq",q:"[Fonctions associées] √u a les mêmes variations que u…",c:["là où u ≥ 0","partout sur ℝ","là où u ≤ 0","jamais"],a:0,explain:"√u est définie où u ≥ 0 et la racine conserve l'ordre."},
+   {type:"num",q:"[Exponentielle] e⁰ = ?",a:"1",explain:"Définition : exp(0) = 1."},
+   {type:"mcq",q:"[Trigonométrie] La période des fonctions cos et sin est…",c:["2π","π","1","180"],a:0,explain:"Un tour complet du cercle : 2π."},
+   {type:"num",q:"[Produit scalaire] Al-Kashi : b = 4, c = 5, cos(Â) = 0,5. a² = ?",a:"21",explain:"a² = 16 + 25 − 2×4×5×0,5 = 41 − 20 = 21."},
+   {type:"num",q:"[Probabilités] P(A∩B) = 0,1 et P(A̅∩B) = 0,25. P(B) = ? (écris 0.35)",a:"0.35",explain:"Probabilités totales : 0,1 + 0,25 = 0,35."}]}
+]},
+ex5:{icon:"📝",title:"Évaluation n°5",desc:"Format évaluation commune · Sujet de synthèse : tous les chapitres du programme.",
+ sections:[
+ {id:"e5s1",title:"Sujet complet — 10 questions",desc:"Barème /20 · Calculatrice autorisée · ~45 min",
+  course:[
+   {h:"📋 Consignes",p:"Le sujet de synthèse finale : une question par grand thème du programme. Si tu obtiens 3 étoiles ici, tu es prêt·e pour une vraie évaluation commune. Bonne chance !",
+    method:["Une question par chapitre : second degré, suites (×2), dérivation, exponentielle, trigonométrie, géométrie repérée (×2), variables aléatoires, parabole.","Gère ton temps : pas plus de 4 minutes par question.","2 points par question. Objectif : 20/20 !"]}],
+  ex:[
+   {type:"mcq",q:"[Second degré] Si a &lt; 0, le sommet de la parabole est…",c:["un maximum","un minimum","sur l'axe des abscisses","à l'origine"],a:0,explain:"a &lt; 0 : parabole tournée vers le bas, le sommet est le point le plus haut."},
+   {type:"num",q:"[Second degré] x² − 2x − 15 = 0 (Δ = 64). La plus grande racine vaut… ?",a:"5",explain:"x = (2 ± 8)/2 : les racines sont −3 et 5."},
+   {type:"num",q:"[Suites] La suite 4, 12, 36… est géométrique. Sa raison q = ?",a:"3",explain:"12/4 = 3, 36/12 = 3."},
+   {type:"mcq",q:"[Suites] La formule uₙ = u₀ + n·r caractérise une suite…",c:["arithmétique","géométrique","constante","aléatoire"],a:0,explain:"Ajout répété de la raison r : suite arithmétique."},
+   {type:"num",q:"[Dérivation] f(x) = 5x² + 2x. Calcule f'(0) = ?",a:"2",explain:"f'(x) = 10x + 2, donc f'(0) = 2."},
+   {type:"mcq",q:"[Exponentielle] eˣ⁺¹ / eˣ = ?",c:["e","eˣ","e²ˣ⁺¹","1"],a:0,explain:"On soustrait les exposants : e⁽ˣ⁺¹⁾⁻ˣ = e¹ = e."},
+   {type:"num",q:"[Trigonométrie] sin(π/2) = ?",a:"1",explain:"En π/2, M est au sommet du cercle : (0 ; 1)."},
+   {type:"mcq",q:"[Géométrie repérée] Un vecteur directeur de 2x + y − 4 = 0 est…",c:["u⃗(−1 ; 2)","u⃗(2 ; 1)","u⃗(1 ; 2)","u⃗(2 ; −4)"],a:0,explain:"u⃗(−b ; a) = u⃗(−1 ; 2)."},
+   {type:"num",q:"[Géométrie repérée] (x − 4)² + (y + 3)² = 49. L'ordonnée du centre est… ?",a:"-3",explain:"(y + 3) = (y − (−3)) : centre Ω(4 ; −3), rayon 7."},
+   {type:"mcq",q:"[Variables aléatoires] Dans toute loi de probabilité, la somme des pᵢ vaut…",c:["1","0","0,5","le nombre de valeurs"],a:0,explain:"Les valeurs couvrent tous les cas possibles : somme = 1."}]}
+]}
+};
+
+/* ================================================================
+   ÉTAT & SAUVEGARDE
+================================================================ */
+let state = {xp:0, done:{}, perfect:false};
+try{
+  const saved = localStorage.getItem("mathquest_premiere");
+  if(saved) state = JSON.parse(saved);
+}catch(e){}
+function save(){ try{ localStorage.setItem("mathquest_premiere", JSON.stringify(state)); }catch(e){} }
+
+const XP_PER_Q = 25;
+function level(){ return Math.floor(state.xp/300)+1 }
+function updateHUD(){
+  document.getElementById("hud-xp").textContent = state.xp;
+  document.getElementById("hud-level").textContent = level();
+  document.getElementById("hud-xpfill").style.width = ((state.xp%300)/300*100)+"%";
+}
+
+/* ================================================================
+   SON — effets générés en direct (Web Audio)
+================================================================ */
+let soundOn = true;
+try{ const s = localStorage.getItem("mathquest_sound"); if(s!==null) soundOn = s==="1"; }catch(e){}
+function toggleSound(){
+  soundOn = !soundOn;
+  if(!soundOn){ stopNarration(); stopDemo(); }
+  document.getElementById("soundbtn").textContent = soundOn ? "🔊":"🔇";
+  try{ localStorage.setItem("mathquest_sound", soundOn?"1":"0"); }catch(e){}
+}
+let actx = null;
+function ac(){ if(!actx) actx = new (window.AudioContext||window.webkitAudioContext)(); return actx; }
+function tone(freq,t0,dur,type,vol){
+  const a=ac(),o=a.createOscillator(),g=a.createGain();
+  o.type=type||"sine"; o.frequency.value=freq;
+  g.gain.setValueAtTime(vol||.2, a.currentTime+t0);
+  g.gain.exponentialRampToValueAtTime(.001, a.currentTime+t0+dur);
+  o.connect(g); g.connect(a.destination);
+  o.start(a.currentTime+t0); o.stop(a.currentTime+t0+dur);
+}
+function sCorrect(){ if(!soundOn) return; try{ tone(523.25,0,.15); tone(659.25,.12,.15); tone(783.99,.24,.3); }catch(e){} }
+function sWrong(){ if(!soundOn) return; try{ tone(196,0,.25,"sawtooth",.12); tone(165,.2,.35,"sawtooth",.12); }catch(e){} }
+function sFanfare(){ if(!soundOn) return; try{ [523.25,659.25,783.99,1046.5].forEach((f,i)=>tone(f,i*.13,.35)); }catch(e){} }
+
+/* ================================================================
+   VOIX — synthèse vocale + correction de prononciation
+================================================================ */
+let voices = [];
+function loadVoices(){ if(window.speechSynthesis) voices = speechSynthesis.getVoices(); }
+loadVoices();
+if(window.speechSynthesis) speechSynthesis.onvoiceschanged = loadVoices;
+const VOICE_PREF = ["Thomas","Audrey","Amélie","Amelie","Aurélie","Marie","Daniel (French"];
+function pickVoice(){
+  const fr = voices.filter(v=>v.lang.toLowerCase().startsWith("fr"));
+  for(const name of VOICE_PREF){
+    const v = fr.find(v=>v.name.includes(name));
+    if(v) return v;
+  }
+  return fr[0];
+}
+/* Corrige la prononciation des maths : « 5 plus 3 » doit se dire « plusse » */
+function speakable(t){
+  return t
+    .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu,"")
+    .replace(/plus ou moins/gi,"plusse ou moins")
+    .replace(/(\d|\bx\b|\bn\b|carré|cube|delta|alpha|beta|pi)\s+plus\s+/gi,"$1 plusse ")
+    .replace(/\bplus\s+(\d|x\b|n\b|b\b|c\b|r\b|q\b|un\b|deux|trois|quatre|cinq|six|sept|huit|neuf|dix|beta|racine|la racine|l'infini)/gi,"plusse $1")
+    .replace(/\+∞/g," l'infini positif ")
+    .replace(/−∞/g," moins l'infini ")
+    .replace(/\+/g," plusse ")
+    .replace(/√/g," racine de ")
+    .replace(/Δ/g," delta ")
+    .replace(/×/g," fois ")
+    .replace(/−/g," moins ")
+    .replace(/≤/g," inférieur ou égal à ")
+    .replace(/≥/g," supérieur ou égal à ")
+    .replace(/≠/g," différent de ")
+    .replace(/π/g," pi ")
+    .replace(/²/g," au carré ")
+    .replace(/³/g," au cube ")
+    .replace(/ⁿ/g," puissance n ")
+    .replace(/uₙ₊₁/g,"u indice n plusse 1")
+    .replace(/uₙ/g,"u indice n")
+    .replace(/vₙ₊₁/g,"v indice n plusse 1")
+    .replace(/vₙ/g,"v indice n")
+    .replace(/u₀/g,"u zéro").replace(/v₀/g,"v zéro")
+    .replace(/x₁/g,"x un").replace(/x₂/g,"x deux").replace(/x₀/g,"x zéro")
+    .replace(/f'/g,"f prime")
+    .replace(/∈/g," appartient à ")
+    .replace(/⟺/g," équivaut à ")
+    .replace(/ℝ/g," R ")
+    .replace(/\b[xX]\b/g," ixe ")
+    .trim();
+}
+function speak(text, onend){
+  let ended = false;
+  const done = ()=>{ if(!ended){ ended=true; onend(); } };
+  if(!soundOn || !window.speechSynthesis){ setTimeout(done, 2600); return; }
+  const clean = speakable(text);
+  const u = new SpeechSynthesisUtterance(clean);
+  const v = pickVoice(); if(v) u.voice = v;
+  u.lang = "fr-FR"; u.rate = 1;
+  u.onend = done; u.onerror = done;
+  try{ speechSynthesis.resume(); speechSynthesis.speak(u); }catch(e){ setTimeout(done, 2600); return; }
+  const est = Math.max(3500, clean.split(/\s+/).length * 480) + 2000;
+  setTimeout(done, est);
+}
+function stopSpeech(){ if(window.speechSynthesis) speechSynthesis.cancel(); }
+
+/* ================================================================
+   NAVIGATION
+================================================================ */
+let curCh = null, curSec = null, cur = null;
+function chapterSections(chId){ return CHAPTERS[chId].sections }
+function findSection(secId){
+  for(const chId in CHAPTERS){
+    const s = CHAPTERS[chId].sections.find(s=>s.id===secId);
+    if(s) return {ch:chId, sec:s};
+  }
+  return null;
+}
+function isSecUnlocked(chId, idx){
+  if(idx===0) return true;
+  return !!state.done[CHAPTERS[chId].sections[idx-1].id];
+}
+function goHome(){
+  stopNarration(); stopDemo();
+  ["view-chapter","view-section"].forEach(v=>document.getElementById(v).classList.add("hidden"));
+  document.getElementById("view-home").classList.remove("hidden");
+  renderHome();
+}
+function openChapter(chId){
+  stopNarration(); stopDemo();
+  curCh = chId;
+  document.getElementById("view-home").classList.add("hidden");
+  document.getElementById("view-section").classList.add("hidden");
+  document.getElementById("view-chapter").classList.remove("hidden");
+  renderChapter();
+}
+function openSection(secId){
+  stopNarration(); stopDemo();
+  const f = findSection(secId);
+  curCh = f.ch; curSec = f.sec;
+  cur = {qi:0, score:0, answered:false, selected:null, results:[]};
+  document.getElementById("view-home").classList.add("hidden");
+  document.getElementById("view-chapter").classList.add("hidden");
+  document.getElementById("view-section").classList.remove("hidden");
+  document.getElementById("section-title").textContent = CHAPTERS[curCh].icon+" "+curSec.title;
+  document.getElementById("sec-back").onclick = ()=>openChapter(curCh);
+  ["tab-course","tab-ex","tab-res"].forEach(id=>document.getElementById(id).classList.remove("done"));
+  showPhase("course");
+  renderCourse();
+}
+function showPhase(p){
+  ["course","ex","res"].forEach(x=>{
+    document.getElementById("phase-"+x).classList.toggle("hidden", x!==p);
+    document.getElementById("tab-"+x).classList.toggle("active", x===p);
+  });
+  window.scrollTo({top:0});
+}
+
+/* ================================================================
+   RENDU ACCUEIL & CHAPITRE
+================================================================ */
+function renderHome(){
+  updateHUD();
+  const el = document.getElementById("domains");
+  el.innerHTML = "";
+  DOMAINS.forEach(d=>{
+    const wd = document.createElement("div"); wd.className="world";
+    wd.innerHTML = `<div class="world-head"><div class="icon">${d.icon}</div><div><h2>${d.name}</h2></div></div>`;
+    const grid = document.createElement("div"); grid.className="missions";
+    d.chapters.forEach(chId=>{
+      const ch = CHAPTERS[chId];
+      const total = ch.sections.length;
+      const done = ch.sections.filter(s=>state.done[s.id]).length;
+      const card = document.createElement("div");
+      card.className = "mission";
+      card.innerHTML = `
+        ${done===total ? '<div class="donebadge">✓ Terminé</div>':''}
+        <div class="m-icon">${ch.icon}</div><h3>${ch.title}</h3><p>${ch.desc}</p>
+        <div class="chprog"><div class="bar"><div class="fill" style="width:${done/total*100}%"></div></div>
+        <div class="lbl">${done}/${total}</div></div>`;
+      card.onclick = ()=>openChapter(chId);
+      grid.appendChild(card);
+    });
+    wd.appendChild(grid); el.appendChild(wd);
+  });
+  renderBadges();
+}
+function renderChapter(){
+  const ch = CHAPTERS[curCh];
+  document.getElementById("chapter-title").textContent = ch.icon+" "+ch.title;
+  const el = document.getElementById("seclist");
+  el.innerHTML = "";
+  ch.sections.forEach((s,i)=>{
+    const unlocked = isSecUnlocked(curCh,i);
+    const d = state.done[s.id];
+    const row = document.createElement("div");
+    row.className = "secrow"+(unlocked?"":" locked");
+    row.innerHTML = `
+      <div class="secnum">${unlocked ? (i+1) : "🔒"}</div>
+      <div class="body"><h3>${s.title}</h3><p>${s.desc}</p></div>
+      <div class="stars">${d ? "★".repeat(d.stars)+"☆".repeat(3-d.stars) : "☆☆☆"}</div>`;
+    row.onclick = ()=>{ if(unlocked) openSection(s.id); else alert("Termine d'abord la section précédente !"); };
+    el.appendChild(row);
+  });
+}
+function renderBadges(){
+  const all = Object.values(CHAPTERS).flatMap(c=>c.sections);
+  const nDone = all.filter(s=>state.done[s.id]).length;
+  const chDone = Object.values(CHAPTERS).filter(c=>c.sections.every(s=>state.done[s.id])).length;
+  const defs = [
+    {icon:"🥇",label:"Première section", on:nDone>=1},
+    {icon:"🔥",label:"5 sections réussies", on:nDone>=5},
+    {icon:"📗",label:"Une leçon terminée", on:chDone>=1},
+    {icon:"👑",label:"Tout le programme", on:nDone>=all.length},
+    {icon:"💎",label:"Un sans-faute", on:state.perfect},
+    {icon:"⚡",label:"1000 XP", on:state.xp>=1000},
+  ];
+  document.getElementById("badges").innerHTML = defs.map(b=>
+    `<div class="badge${b.on?"":" off"}">${b.icon} ${b.label}</div>`).join("");
+}
+
+/* ================================================================
+   COURS + NARRATION + DÉMO ANIMÉE
+================================================================ */
+function demoSvg(d){ return d.lines ? linesSvg(d.lines) : d.svg }
+function demoId(x){ return typeof x==="number" ? "dl"+x : x }
+function renderCourse(){
+  const s = curSec;
+  const demo = s.demo ? `
+    <div class="course-card">
+      <h3>🎬 Démonstration animée</h3>
+      <div class="schema" id="animbox">${demoSvg(s.demo)}</div>
+      <button class="bigbtn" id="demobtn" onclick="playDemo()">▶️ Lancer la démonstration</button>
+    </div>` : "";
+  document.getElementById("phase-course").innerHTML =
+    `<div class="narrbar"><button class="narrbtn" id="narrbtn" onclick="toggleNarration()">▶️ Écouter la leçon</button></div>` +
+    s.course.map((c,ci)=>`
+    <div class="course-card" id="cc${ci}">
+      <h3>${c.h}</h3>
+      ${c.p?`<p>${c.p}</p>`:""}
+      ${c.method?`<div class="method">${c.method.map((st,i)=>`
+        <div class="step" id="cc${ci}s${i}"><div class="stepnum">${i+1}</div><p>${st}</p></div>`).join("")}</div>`:""}
+      ${c.tip?`<div class="tipbox" id="cc${ci}t">💡 ${c.tip}</div>`:""}
+    </div>`).join("") + demo +
+    `<button class="bigbtn" onclick="startExercises()">C'est parti, aux exercices ! →</button>`;
+}
+
+let narrPlaying=false, narrSeq=[], narrIdx=0;
+function clearHighlights(){ document.querySelectorAll(".speaking").forEach(e=>e.classList.remove("speaking")); }
+function updateNarrBtn(){
+  const b=document.getElementById("narrbtn"); if(!b) return;
+  b.textContent = narrPlaying ? "⏹ Arrêter la lecture" : "▶️ Écouter la leçon";
+  b.classList.toggle("on", narrPlaying);
+}
+function toggleNarration(){
+  if(narrPlaying){ stopNarration(); return; }
+  stopDemo();
+  narrSeq = [];
+  curSec.course.forEach((c,i)=>{
+    if(c.p) narrSeq.push({el:"cc"+i, text:c.p});
+    if(c.method) c.method.forEach((st,j)=>narrSeq.push({el:"cc"+i+"s"+j, text:st}));
+    if(c.tip) narrSeq.push({el:"cc"+i+"t", text:c.tip});
+  });
+  narrIdx = 0; narrPlaying = true;
+  updateNarrBtn(); narrNext();
+}
+function narrNext(){
+  clearHighlights();
+  if(!narrPlaying || narrIdx>=narrSeq.length){ stopNarration(); return; }
+  const s = narrSeq[narrIdx];
+  const el = document.getElementById(s.el);
+  if(el){ el.classList.add("speaking"); el.scrollIntoView({behavior:"smooth",block:"center"}); }
+  speak(s.text, ()=>{ narrIdx++; narrNext(); });
+}
+function stopNarration(){ narrPlaying=false; stopSpeech(); clearHighlights(); updateNarrBtn(); }
+
+let demoPlaying=false;
+function resetDemo(){ document.querySelectorAll("#animbox .anim-el").forEach(e=>e.classList.remove("show","glow")); }
+function playDemo(){
+  if(demoPlaying){ stopDemo(); return; }
+  stopNarration();
+  demoPlaying = true;
+  const b=document.getElementById("demobtn"); if(b) b.textContent = "⏹ Arrêter la démonstration";
+  resetDemo(); demoStep(0);
+}
+function demoStep(i){
+  if(!demoPlaying) return;
+  const steps = curSec.demo.steps;
+  if(i>=steps.length){ sCorrect(); stopDemo(); return; }
+  const s = steps[i];
+  (s.hide||[]).forEach(id=>{ const e=document.getElementById(demoId(id)); if(e) e.classList.remove("show"); });
+  (s.show||[]).forEach(id=>{ const e=document.getElementById(demoId(id)); if(e) e.classList.add("show"); });
+  (s.glow||[]).forEach(id=>{ const e=document.getElementById(demoId(id)); if(e) e.classList.add("glow"); });
+  speak(s.n, ()=>demoStep(i+1));
+}
+function stopDemo(){
+  demoPlaying = false; stopSpeech();
+  const b=document.getElementById("demobtn"); if(b) b.textContent = "▶️ Lancer la démonstration";
+}
+
+/* ================================================================
+   EXERCICES
+================================================================ */
+function startExercises(){
+  stopNarration(); stopDemo();
+  cur.qi = 0; cur.score = 0; cur.results = [];
+  showPhase("ex");
+  renderQuestion();
+}
+function renderQuestion(){
+  const q = curSec.ex[cur.qi];
+  cur.answered = false; cur.selected = null;
+  const dots = curSec.ex.map((_,i)=>{
+    let c = "ex-dot";
+    if(i<cur.qi) c += cur.results[i] ? " ok":" ko";
+    else if(i===cur.qi) c += " cur";
+    return `<div class="${c}"></div>`;
+  }).join("");
+  let body;
+  if(q.type==="mcq"){
+    body = `<div class="choices">${q.c.map((c,i)=>
+      `<button class="choice" id="ch${i}" onclick="selectChoice(${i})">${c}</button>`).join("")}</div>`;
+  } else {
+    body = `<input class="numinput" id="numans" inputmode="text" placeholder="Ta réponse…" onkeydown="if(event.key==='Enter')checkAnswer()">`;
+  }
+  document.getElementById("phase-ex").innerHTML = `
+    <div class="ex-progress">${dots}</div>
+    <div class="question">
+      <div class="qtxt">${q.q}</div>
+      ${body}
+      <div class="feedback" id="fb"></div>
+      <button class="bigbtn" id="actionbtn" onclick="checkAnswer()">Valider</button>
+    </div>`;
+  const inp = document.getElementById("numans"); if(inp) inp.focus();
+}
+function selectChoice(i){
+  if(cur.answered) return;
+  cur.selected = i;
+  document.querySelectorAll(".choice").forEach((b,j)=>b.classList.toggle("sel", j===i));
+}
+function checkAnswer(){
+  if(cur.answered){ nextQuestion(); return; }
+  const q = curSec.ex[cur.qi];
+  let ok;
+  if(q.type==="mcq"){
+    if(cur.selected===null) return;
+    ok = cur.selected===q.a;
+    document.getElementById("ch"+q.a).classList.add("correct");
+    if(!ok) document.getElementById("ch"+cur.selected).classList.add("wrong");
+  } else {
+    const v = (document.getElementById("numans").value||"").trim().replace(",",".").replace(/\s/g,"");
+    if(v==="") return;
+    ok = v===String(q.a) || (parseFloat(v)===parseFloat(q.a) && !isNaN(parseFloat(v)));
+    document.getElementById("numans").style.borderColor = ok ? "var(--green)":"var(--red)";
+  }
+  cur.answered = true;
+  cur.results.push(ok);
+  if(ok) sCorrect(); else sWrong();
+  if(ok){ cur.score++; state.xp += XP_PER_Q; save(); updateHUD(); }
+  const fb = document.getElementById("fb");
+  fb.className = "feedback "+(ok?"good":"bad");
+  fb.innerHTML = `<strong>${ok?"✅ Bravo !":"❌ Pas tout à fait."}</strong> ${!ok ? "La bonne réponse était : <strong>"+(q.type==="mcq"?q.c[q.a]:q.a)+"</strong>. " : ""}<br>${q.explain}`;
+  document.getElementById("actionbtn").textContent = (cur.qi < curSec.ex.length-1) ? "Question suivante →" : "Voir mon résultat 🏆";
+}
+function nextQuestion(){
+  if(cur.qi < curSec.ex.length-1){ cur.qi++; renderQuestion(); }
+  else showResults();
+}
+function showResults(){
+  const n = curSec.ex.length, s = cur.score;
+  const stars = s===n ? 3 : (s>=Math.ceil(n*0.6) ? 2 : (s>0 ? 1 : 0));
+  const prev = state.done[curSec.id];
+  if(!prev || stars > prev.stars) state.done[curSec.id] = {stars};
+  if(s===n) state.perfect = true;
+  save(); updateHUD(); sFanfare();
+  const secs = CHAPTERS[curCh].sections;
+  const idx = secs.findIndex(x=>x.id===curSec.id);
+  const next = secs[idx+1];
+  const titles = ["Section terminée !","Excellent travail !","Score parfait !"];
+  document.getElementById("phase-res").innerHTML = `
+    <div class="result">
+      <div style="font-size:52px">${stars===3?"🏆":stars===2?"🎉":"💪"}</div>
+      <div class="bigstars">${"★".repeat(stars)}${"☆".repeat(3-stars)}</div>
+      <h2>${titles[stars===3?2:(stars===2?1:0)]}</h2>
+      <p>${s} / ${n} bonnes réponses</p>
+      <div class="xpgain">+${s*XP_PER_Q} XP ⚡</div>
+      <div style="display:grid;gap:10px;max-width:340px;margin:0 auto">
+        ${next?`<button class="bigbtn" onclick="openSection('${next.id}')">Section suivante →</button>`:""}
+        <button class="backbtn" onclick="startExercises()">Refaire les exercices</button>
+        <button class="backbtn" onclick="openChapter('${curCh}')">Retour à la leçon</button>
+      </div>
+    </div>`;
+  showPhase("res");
+  document.getElementById("tab-course").classList.add("done");
+  document.getElementById("tab-ex").classList.add("done");
+}
+
+/* INIT */
+document.getElementById("soundbtn").textContent = soundOn ? "🔊":"🔇";
+renderHome();
+</script>
+</body>
+</html>
